@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#130d26">
+<title>Sinapse Final — Experiência interativa</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0815;--card:#1b1430;--line:#473268;--txt:#f7f2ff;--muted:#c6b8da;--a:#b68cff;--b:#7ce8e0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#32184e 0%,#0b0815 60%);color:var(--txt);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100svh}button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid var(--b);outline-offset:3px}.wrap{width:min(850px,100%);margin:auto;padding:20px 16px 110px}.eyebrow{letter-spacing:.15em;text-transform:uppercase;font-size:.73rem;font-weight:800;color:var(--b)}h1{font-size:clamp(2rem,7vw,3.5rem);line-height:1.04;margin:.35rem 0 1rem}h2{font-size:1.4rem;line-height:1.2;margin:0 0 10px}p{margin:.45rem 0 1rem}.lead{color:var(--muted);max-width:600px}.hero{padding:26px 22px;border:1px solid #7445a6;border-radius:24px;background:linear-gradient(130deg,#361a5d 0%,#180f2b 70%);box-shadow:0 12px 45px #0007;position:relative;overflow:hidden}.hero:after{content:'ϟ';position:absolute;right:0;top:-60px;font-size:220px;line-height:1;color:#a76ff221;pointer-events:none}.hero>*{position:relative;z-index:1}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:18px 0}.card{background:#1b1430dd;border:1px solid var(--line);border-radius:18px;padding:18px}.card p,.muted{color:var(--muted)}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:45px;text-align:left;border:1px solid #8b64bf;border-radius:12px;color:white;background:#42236a;padding:10px 16px;font-weight:700;margin:5px 6px 5px 0}.btn.primary{background:linear-gradient(110deg,#8653de,#4b2e96);border-color:#ad82fd}.btn.alt{background:#1a2036;border-color:#477f8b}.btn:disabled{opacity:.6;cursor:default}.choices{display:grid;gap:10px;margin-top:22px}.choices .btn{width:100%;margin:0;justify-content:flex-start}.chapter{font-size:1.1rem;line-height:1.85;white-space:pre-line}.small{font-size:.82rem;color:var(--muted)}.tag{display:inline-block;background:#34274a;border-radius:30px;padding:4px 9px;font-size:.78rem;color:#ddc6ff}nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:#100b1df2;border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 8px max(8px,env(safe-area-inset-bottom));gap:5px;backdrop-filter:blur(12px)}nav button{color:#d4c7eb;background:transparent;border:0;border-radius:10px;padding:10px 6px;flex:1;max-width:180px;font-size:.82rem}nav button[aria-current="page"]{background:#4e2b78;color:#fff;font-weight:800}.hidden{display:none!important}.meter{height:7px;border-radius:30px;background:#3d2e50;overflow:hidden;margin:14px 0}.meter>div{height:100%;width:0;background:linear-gradient(90deg,#a578ff,#7ce8e0);transition:width .2s}footer{font-size:.8rem;color:#baaaca;margin-top:20px}.success{color:var(--b);font-weight:700}
+.art{display:block;width:100%;height:auto;border-radius:17px;border:1px solid #6a4789;margin:12px 0 17px}.portrait{display:block;width:100%;height:auto;border-radius:14px;margin-bottom:12px;box-shadow:0 10px 24px rgba(0,0,0,.35)}.character-card h2{margin-top:6px}.character-card .tag{margin-bottom:10px}.character-card p{font-size:.96rem;line-height:1.55}.character-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:14px}.chapter-art{margin:0 0 12px}.book-panel{background:#130e25;border:1px solid #533772;border-radius:14px;padding:14px;margin:15px 0}.book-panel label{display:block;margin:7px 0}.book-panel input{width:100%;accent-color:#ac84ff}.reader-large .chapter{font-size:1.3rem}.reader-large .chapter{line-height:2}.notice{border-left:3px solid #a77bea;padding:10px 14px;background:#201631;margin:16px 0;color:#e4d5fb}</style>
+<style>
+.scene-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:16px 0}.scene-panels figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid #644187;background:#150f28}.scene-panels svg{display:block;width:100%;height:auto}.scene-panels figcaption{padding:9px 12px;color:#ddc9f4;font-size:.82rem}.chapter{overflow-wrap:break-word}.chapter-nav{display:flex;flex-wrap:wrap;align-items:center;gap:7px}.chapter-nav .btn{margin:0}.chapter-nav .btn:disabled{opacity:.35}
+.music-control{position:fixed;z-index:9;right:12px;top:max(12px,env(safe-area-inset-top));border:1px solid #9266ca;border-radius:999px;background:#130e25e8;color:#fff;padding:9px 13px;box-shadow:0 8px 24px #0008;backdrop-filter:blur(10px);font-size:.82rem;font-weight:800}.music-control.playing{background:#563087;border-color:#c19cff}.music-control:focus-visible{outline:3px solid var(--b)}
+</style>
+</head>
+<body>
+<audio id="soundtrack" loop preload="auto" src="audio/nerakar-tempestade.wav"></audio>
+<button class="music-control" id="musicToggle" type="button" aria-pressed="false">♪ Música</button>
+<main class="wrap">
+<section id="home" class="page">
+ <header class="hero">
+<div class="eyebrow">Universo interativo de Cláudio Henrique</div>
+<h1>SINAPSE<br>FINAL <span style="color:#be9afe">ϟ</span>
+</h1>
+<p class="lead">Uma tempestade roxa. Dois antigos amigos. Uma cidade à beira do impossível.</p>
+<button class="btn primary" data-go="read">Começar a ler →</button>
+<button class="btn alt" data-go="game">Jogar a cena</button>
+</header>
+ <svg class="art" viewBox="0 0 800 350" role="img" aria-label="Cidade de Nerakar sob relâmpagos roxos" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="sky" x2="0" y2="1">
+<stop stop-color="#090c22"/>
+<stop offset="1" stop-color="#4b2873"/>
+</linearGradient>
+<linearGradient id="lit" x2="0" y2="1">
+<stop stop-color="#c7a5ff"/>
+<stop offset="1" stop-color="#6c38ad"/>
+</linearGradient>
+</defs>
+<rect width="800" height="350" fill="url(#sky)"/>
+<circle cx="635" cy="85" r="59" fill="#a26bda" opacity=".16"/>
+<path d="M380 0 345 72 392 91 315 210 350 114 302 91 331 0M615 0 588 53 622 70 567 151 584 79 554 62 580 0" fill="url(#lit)" stroke="#f1e1ff" stroke-width="2"/>
+<g fill="#110f23">
+<path d="M0 235h38v-78h49v43h26v-94h55v96h42v-49h46v-88h77v135h38v-55h52v85h40v-125h61v112h32v-72h48v90h44v-125h57v90h38v-61h41v190H0z"/>
+</g>
+<g fill="#bd8ff9" opacity=".57">
+<path d="M120 125h7v11h-7zm20 0h7v11h-7zm130-40h7v11h-7zm25 20h7v11h-7zm100 62h7v11h-7zm94-36h7v11h-7zm110 0h7v11h-7zm80 58h7v11h-7z"/>
+</g>
+<path d="M0 328q170-40 360 0t440-11v33H0" fill="#050611"/>
+<g stroke="#c29ce8" stroke-opacity=".4">
+<path d="M10 0 90 350M120 0l80 350M300 0l80 350M500 0l80 350M680 0l80 350"/>
+</g>
+</svg>
+<div class="scene-panels" aria-label="Galeria ilustrada do primeiro capítulo">
+<figure>
+<svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Caleb e Oliver se encaram no colégio abandonado durante a tempestade">
+<defs>
+<linearGradient id="x1" x2="1" y2="1">
+<stop stop-color="#141128"/>
+<stop offset="1" stop-color="#542a76"/>
+</linearGradient>
+</defs>
+<rect width="460" height="300" fill="url(#x1)"/>
+<path d="M0 20 100 0 100 290 0 300zm360-20 100 24v276H360z" fill="#12101f"/>
+<path d="M105 30h250v212H105z" fill="#1b1432" stroke="#9e83bf" stroke-width="5"/>
+<path d="m201 30-22 80 41 16-41 116m125-210 12 65-43 36 48 109" stroke="#a88bdb" stroke-width="3" fill="none"/>
+<path d="M120 0 190 78l-37 55 91 9-51 101 19-81-86-12 35-68z" fill="#bc95ff"/>
+<path d="M0 255h460v45H0z" fill="#090a13"/>
+<g fill="#090b17">
+<circle cx="162" cy="143" r="23"/>
+<path d="m142 164-23 92h94l-26-91z"/>
+<circle cx="309" cy="143" r="22"/>
+<path d="m286 165-30 91h98l-27-91z"/>
+</g>
+<path d="m145 147 13 0m158 0 13 0" stroke="#bf8bff" stroke-width="3"/>
+<path d="m289 146 11 0" stroke="#fb6573" stroke-width="3"/>
+<path d="m10 296 110-60m340 56-114-62" stroke="#6c4c92" stroke-width="2"/>
+</svg>
+<figcaption>Confronto no colégio</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Uma descarga de energia púrpura explode na sala, cercando Caleb">
+<defs>
+<radialGradient id="x2">
+<stop stop-color="#f8e4ff"/>
+<stop offset=".35" stop-color="#aa68ff"/>
+<stop offset="1" stop-color="#120b30"/>
+</radialGradient>
+</defs>
+<rect width="460" height="300" fill="#0e0c24"/>
+<path d="M0 18h460v190l-68-12-65 18-98-31-107 20L0 177z" fill="#29213e"/>
+<circle cx="230" cy="155" r="125" fill="url(#x2)" opacity=".82"/>
+<g stroke="#e5c1ff" fill="none" stroke-width="5">
+<path d="m231 151-40-134 50 68-23 35 77-22-45 52 157-47-102 83 122 82-166-61-30 90-25-92L22 261l124-92L25 98l151 45z"/>
+</g>
+<path d="M220 125h22l14 38-15 41h-31l-13-41z" fill="#120d24"/>
+<circle cx="231" cy="111" r="16" fill="#120d24"/>
+</svg>
+<figcaption>O poder da tempestade</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Caleb enfrenta cinco mercenários na rua em meio à chuva roxa">
+<defs>
+<linearGradient id="x3" x2="0" y2="1">
+<stop stop-color="#190c30"/>
+<stop offset="1" stop-color="#62357d"/>
+</linearGradient>
+</defs>
+<rect width="460" height="300" fill="url(#x3)"/>
+<path d="M0 180h28V90h60v55h45V58h75v132h45V110h70v80h44V74h68v135h25v91H0z" fill="#110f22"/>
+<path d="M0 250h460v50H0z" fill="#0b0b15"/>
+<g fill="#0a0d17" stroke="#56496a" stroke-width="2">
+<circle cx="230" cy="177" r="19"/>
+<path d="m208 195-28 62h96l-27-62z"/>
+<circle cx="65" cy="190" r="14"/>
+<path d="m48 204-15 52h63l-15-52z"/>
+<circle cx="134" cy="173" r="14"/>
+<path d="m117 187-14 69h62l-15-69z"/>
+<circle cx="326" cy="175" r="14"/>
+<path d="m309 190-14 66h62l-15-66z"/>
+<circle cx="398" cy="190" r="14"/>
+<path d="m380 205-14 52h62l-14-52z"/>
+</g>
+<path d="m205 181 10 0m28 0 10 0" stroke="#c293ff" stroke-width="4"/>
+<path d="m23 0 52 300M118 0l52 300M213 0l52 300M308 0l52 300M403 0l52 300" stroke="#d7b4ff" opacity=".3" stroke-width="2"/>
+<path d="m207 43 35 52-17 37 50 22-51 23 21-25-51-9 31-48z" fill="#e0bcff"/>
+</svg>
+<figcaption>Cinco mercenários na rua</figcaption>
+</figure>
+</div>
+<div class="grid">
+<article class="card">
+<span class="tag">Leitura</span>
+<h2>O Brilho da Tempestade</h2>
+<p>Leia o capítulo 1 completo, com todas as falas e batalhas do texto original.</p>
+<button class="btn" data-go="read">Abrir capítulo</button>
+</article>
+<article class="card">
+<span class="tag">Interativo</span>
+<h2>Escolhas sob a chuva</h2>
+<p>Experimente uma cena alternativa inspirada no confronto de Caleb e Oliver.</p>
+<button class="btn" data-go="game">Entrar na história</button>
+</article>
+<article class="card">
+<span class="tag">Desafio</span>
+<h2>Você conhece a tempestade?</h2>
+<p>Responda a seis perguntas sobre os acontecimentos do capítulo 1.</p>
+<button class="btn" data-go="quiz">Fazer quiz</button>
+</article>
+</div>
+ <p class="small">Esta versão inclui o capítulo 1 completo fornecido pelo autor. As ilustrações são conceituais e o jogo é uma cena alternativa, sem alterar o cânone do livro.</p>
+</section>
+<section id="read" class="page hidden">
+<div class="eyebrow">Biblioteca • capítulo 1</div>
+<h1>O Brilho da Tempestade</h1>
+<div class="chapter-art">
+<svg class="art" viewBox="0 0 800 350" role="img" aria-label="Cidade de Nerakar sob relâmpagos roxos" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="sky" x2="0" y2="1">
+<stop stop-color="#090c22"/>
+<stop offset="1" stop-color="#4b2873"/>
+</linearGradient>
+<linearGradient id="lit" x2="0" y2="1">
+<stop stop-color="#c7a5ff"/>
+<stop offset="1" stop-color="#6c38ad"/>
+</linearGradient>
+</defs>
+<rect width="800" height="350" fill="url(#sky)"/>
+<circle cx="635" cy="85" r="59" fill="#a26bda" opacity=".16"/>
+<path d="M380 0 345 72 392 91 315 210 350 114 302 91 331 0M615 0 588 53 622 70 567 151 584 79 554 62 580 0" fill="url(#lit)" stroke="#f1e1ff" stroke-width="2"/>
+<g fill="#110f23">
+<path d="M0 235h38v-78h49v43h26v-94h55v96h42v-49h46v-88h77v135h38v-55h52v85h40v-125h61v112h32v-72h48v90h44v-125h57v90h38v-61h41v190H0z"/>
+</g>
+<g fill="#bd8ff9" opacity=".57">
+<path d="M120 125h7v11h-7zm20 0h7v11h-7zm130-40h7v11h-7zm25 20h7v11h-7zm100 62h7v11h-7zm94-36h7v11h-7zm110 0h7v11h-7zm80 58h7v11h-7z"/>
+</g>
+<path d="M0 328q170-40 360 0t440-11v33H0" fill="#050611"/>
+<g stroke="#c29ce8" stroke-opacity=".4">
+<path d="M10 0 90 350M120 0l80 350M300 0l80 350M500 0l80 350M680 0l80 350"/>
+</g>
+</svg>
+</div>
+<div class="book-panel">
+<label for="fontSize">Tamanho da letra</label>
+<input id="fontSize" type="range" min="16" max="27" value="19" aria-label="Tamanho da letra">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px">
+<button class="btn alt" id="readAloud" type="button">🔊 Ler em voz alta</button>
+<span class="small" id="voiceStatus" aria-live="polite">Voz em português do Android</span>
+</div>
+</div>
+<div class="meter" aria-label="Progresso de leitura">
+<div id="readMeter">
+</div>
+</div>
+<article class="card chapter" id="readText" aria-live="polite">
+</article>
+<div class="chapter-nav" style="margin-top:12px">
+<button class="btn alt" id="readPrev">← Anterior</button>
+<button class="btn primary" id="readNext">Próxima página →</button>
+<button class="btn alt" id="readRestart">Recomeçar</button>
+</div>
+<p class="small" id="readCount">
+</p>
+</section>
+<section id="game" class="page hidden">
+<svg class="art" viewBox="0 0 800 350" role="img" aria-label="Cidade de Nerakar sob relâmpagos roxos" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="sky" x2="0" y2="1">
+<stop stop-color="#090c22"/>
+<stop offset="1" stop-color="#4b2873"/>
+</linearGradient>
+<linearGradient id="lit" x2="0" y2="1">
+<stop stop-color="#c7a5ff"/>
+<stop offset="1" stop-color="#6c38ad"/>
+</linearGradient>
+</defs>
+<rect width="800" height="350" fill="url(#sky)"/>
+<circle cx="635" cy="85" r="59" fill="#a26bda" opacity=".16"/>
+<path d="M380 0 345 72 392 91 315 210 350 114 302 91 331 0M615 0 588 53 622 70 567 151 584 79 554 62 580 0" fill="url(#lit)" stroke="#f1e1ff" stroke-width="2"/>
+<g fill="#110f23">
+<path d="M0 235h38v-78h49v43h26v-94h55v96h42v-49h46v-88h77v135h38v-55h52v85h40v-125h61v112h32v-72h48v90h44v-125h57v90h38v-61h41v190H0z"/>
+</g>
+<g fill="#bd8ff9" opacity=".57">
+<path d="M120 125h7v11h-7zm20 0h7v11h-7zm130-40h7v11h-7zm25 20h7v11h-7zm100 62h7v11h-7zm94-36h7v11h-7zm110 0h7v11h-7zm80 58h7v11h-7z"/>
+</g>
+<path d="M0 328q170-40 360 0t440-11v33H0" fill="#050611"/>
+<g stroke="#c29ce8" stroke-opacity=".4">
+<path d="M10 0 90 350M120 0l80 350M300 0l80 350M500 0l80 350M680 0l80 350"/>
+</g>
+</svg>
+<div class="eyebrow">Jogo narrativo • cena alternativa</div>
+<h1>Entre o trovão e o silêncio</h1>
+<article class="card">
+<p class="chapter" id="sceneText" aria-live="polite">
+</p>
+<div class="choices" id="sceneChoices">
+</div>
+</article>
+<p class="small">As escolhas são uma brincadeira inspirada na obra, não acontecimentos oficiais do livro.</p>
+</section>
+<section id="characters" class="page hidden">
+<div class="eyebrow">Conheça o universo</div>
+<h1>Personagens</h1>
+<p class="small">Agora os personagens aparecem com artes visuais dentro do aplicativo.</p>
+<div class="character-grid">
+<article class="card character-card">
+<span class="tag">Protagonista</span>
+<img class="portrait" src="characters/caleb.svg" alt="Poster tecnológico de Caleb com energia roxa"/>
+<h2>Caleb</h2>
+<p>17 anos. Carrega a tempestade dentro de si. Estratégico, leal e intenso, é o centro do conflito que move Sinapse Final.</p>
+</article>
+<article class="card character-card">
+<span class="tag">Rival</span>
+<img class="portrait" src="characters/oliver.svg" alt="Poster tecnológico de Oliver com olhos vermelhos"/>
+<h2>Oliver</h2>
+<p>18 anos. Calculista, brilhante e ambicioso. Antigo amigo de Caleb, agora segue um caminho sombrio e determinado.</p>
+</article>
+<article class="card character-card">
+<span class="tag">Mistério</span>
+<img class="portrait" src="characters/eron.svg" alt="Poster tecnológico de Eron"/>
+<h2>Eron</h2>
+<p>Pesquisador e líder enigmático. Uma figura perigosa e inteligente, ligada aos segredos por trás dos poderes e da tempestade.</p>
+</article>
+<article class="card character-card">
+<span class="tag">Divindade</span>
+<img class="portrait" src="characters/kaelum.svg" alt="Representação tecnológica de Kaelum"/>
+<h2>Kaelum</h2>
+<p>O deus da tempestade. Misterioso, poderoso e ambíguo, é uma presença maior que atravessa o destino de Caleb e de todo o mundo.</p>
+</article>
+</div>
+</section>
+<section id="quiz" class="page hidden">
+<svg class="art" viewBox="0 0 800 350" role="img" aria-label="Cidade de Nerakar sob relâmpagos roxos" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="sky" x2="0" y2="1">
+<stop stop-color="#090c22"/>
+<stop offset="1" stop-color="#4b2873"/>
+</linearGradient>
+<linearGradient id="lit" x2="0" y2="1">
+<stop stop-color="#c7a5ff"/>
+<stop offset="1" stop-color="#6c38ad"/>
+</linearGradient>
+</defs>
+<rect width="800" height="350" fill="url(#sky)"/>
+<circle cx="635" cy="85" r="59" fill="#a26bda" opacity=".16"/>
+<path d="M380 0 345 72 392 91 315 210 350 114 302 91 331 0M615 0 588 53 622 70 567 151 584 79 554 62 580 0" fill="url(#lit)" stroke="#f1e1ff" stroke-width="2"/>
+<g fill="#110f23">
+<path d="M0 235h38v-78h49v43h26v-94h55v96h42v-49h46v-88h77v135h38v-55h52v85h40v-125h61v112h32v-72h48v90h44v-125h57v90h38v-61h41v190H0z"/>
+</g>
+<g fill="#bd8ff9" opacity=".57">
+<path d="M120 125h7v11h-7zm20 0h7v11h-7zm130-40h7v11h-7zm25 20h7v11h-7zm100 62h7v11h-7zm94-36h7v11h-7zm110 0h7v11h-7zm80 58h7v11h-7z"/>
+</g>
+<path d="M0 328q170-40 360 0t440-11v33H0" fill="#050611"/>
+<g stroke="#c29ce8" stroke-opacity=".4">
+<path d="M10 0 90 350M120 0l80 350M300 0l80 350M500 0l80 350M680 0l80 350"/>
+</g>
+</svg>
+<div class="eyebrow">Desafio de leitor</div>
+<h1>Quiz da tempestade</h1>
+<article class="card">
+<p class="small" id="quizProgress">
+</p>
+<h2 id="quizQuestion">
+</h2>
+<div class="choices" id="quizOptions">
+</div>
+<p id="quizFeedback" aria-live="polite">
+</p>
+<button class="btn primary hidden" id="quizNext">Próxima →</button>
+</article>
+</section>
+<footer>Sinapse Final • capítulo 1 integral • leitura e fonte salvas neste navegador • jogo alternativo separado do texto oficial.</footer>
+</main>
+<nav aria-label="Navegação principal">
+<button data-go="home" aria-current="page">⌂ Início</button>
+<button data-go="read">▤ Ler</button>
+<button data-go="game">ϟ Jogar</button>
+<button data-go="characters">♟ Elenco</button>
+<button data-go="quiz">✦ Quiz</button>
+</nav>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const store={get(key){try{return localStorage.getItem(key)}catch{return null}},set(key,val){try{localStorage.setItem(key,String(val))}catch{}}};
+const soundtrack=$('soundtrack'),musicToggle=$('musicToggle');
+soundtrack.volume=.22;
+let musicWasPlayingBeforeVoice=false;
+function paintMusic(){const playing=!soundtrack.paused;musicToggle.classList.toggle('playing',playing);musicToggle.setAttribute('aria-pressed',String(playing));musicToggle.textContent=playing?'❚❚ Trilha':'♪ Música'}
+musicToggle.addEventListener('click',async()=>{if(soundtrack.paused){try{await soundtrack.play();store.set('sf_music','on')}catch{musicToggle.textContent='Toque novamente'}}else{soundtrack.pause();store.set('sf_music','off')}paintMusic()});
+soundtrack.addEventListener('play',paintMusic);soundtrack.addEventListener('pause',paintMusic);
+function go(id,{history=true}={}){const target=$(id);if(!target||!target.classList.contains('page'))return;if(id!=='read'&&typeof stopReading==='function')stopReading();document.querySelectorAll('.page').forEach(el=>el.classList.toggle('hidden',el.id!==id));document.querySelectorAll('[data-go]').forEach(el=>{if(el.closest('nav')){if(el.dataset.go===id)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current')}});if(history&&location.hash!==`#${id}`)window.history.pushState({screen:id},'',`#${id}`);window.scrollTo({top:0,behavior:'smooth'});if(id==='read')renderRead();if(id==='game')renderScene();if(id==='quiz')renderQuiz()}
+document.addEventListener('click',event=>{const option=event.target.closest('[data-go]');if(!option)return;event.preventDefault();go(option.dataset.go)});
+window.addEventListener('popstate',()=>go(location.hash.slice(1)||'home',{history:false}));
+document.querySelectorAll('button').forEach(button=>{if(!button.type)button.type='button'});
+// Capítulo 1 integral, reprodução literal do texto fornecido pelo autor nesta conversa.
+const pages=["Chovia com fúria sobre a metrópole. Mas não era uma tempestade comum. Os relâmpagos que cortavam os céus não eram brancos — eram roxos, quase etéreos, como se uma fúria celestial vestida em púrpura castigasse a cidade sem piedade.\n\nA água, misturada ao pó e à destruição, escorria pelas ruas como veneno líquido. Prédios tremiam, postes caíam, e os gritos se perdiam no som estrondoso dos trovões.\n\nDentro de uma sala de aula no topo de um colégio abandonado, duas figuras se encaravam à meia-luz. Os vidros quebrados deixavam o vento e a chuva entrarem, espalhando papéis e poeira por todo o chão.\n\nCaleb e Oliver.", "Dois antigos amigos. Agora, inimigos marcados pelo destino.\n\nCaleb olhava fixamente nos olhos de Oliver. Seu rosto estava endurecido, mas havia tristeza em sua expressão.\n\n— Como você pode guardar tanta maldade dentro de si? — perguntou, com a voz embargada. — Você está irreconhecível, Oliver.\n\nOliver deu um passo à frente, encharcado pela chuva, o rosto tomado por cicatrizes e raiva mal contida.", "— Você sabe o que é perder tudo, Caleb? — respondeu, a voz carregada de rancor. — Sabe como é ser o melhor... e de repente ser apagado por alguém como você? Um inútil que se tornou o \"escolhido\", enquanto eu fui jogado no esquecimento!\n\nEle franziu o rosto, e por um segundo a voz dele falhou.\n— Até a Lysandra conseguia ver isso. Ela te enxergava demais… mais do que eu.\n\nCaleb tentou se aproximar.\n\n— Não traz ela pra isso. A gente prometeu, lembra? Nenhum de nós ia transformar a Lysandra em munição.", "Oliver cerrou a mandíbula.\n— E você cumpriu? Porque eu lembro muito bem de como você olhava pra ela.\n\nCaleb desviou só um instante, incomodado — e Oliver percebeu.\n\n— Ainda dá tempo de parar com isso. Você não precisa seguir esse caminho. — disse Caleb, retomando o foco.\n\nMas Oliver apenas riu. Uma risada amarga, quase insana.", "— Me diga, Caleb... de onde vieram esses raios? Esse poder de eletricidade que agora brilha em você? Você nem sabe o que tem! É sorte! Só isso. E é por isso que eu te odeio.\n\nA voz dele desceu para um tom quase baixo demais.\n— Tudo começou ali… quando ela sumiu. Quando nós dois ficamos esperando respostas que nunca vieram.\n\nCaleb fechou os olhos por um segundo. Quando os abriu, algo havia mudado neles: uma sombra púrpura vibrava em suas íris.\n\n— Esse poder... não é sorte. É maldição. — disse, com a voz grave. — Eu tive que encarar a verdadeira escuridão. Essa tempestade... ela mora dentro de mim. A mesma que queima a cidade agora. Eu a vi. E ela me viu de volta. Você nunca entenderia...", "Oliver cerrou os punhos. Seus olhos se estreitaram de raiva.\n\n— Entenderia, sim. Eu só não tive “a tempestade” pra me salvar. Nem a Lysandra pra me olhar daquele jeito. — Ele quase cuspiu o nome.\n\n— Já ouvi demais. — disse.\n\nCom um gesto súbito, cinco figuras emergiram das sombras da sala: capangas de Oliver. Cercaram Caleb com precisão, e em segundos, cordas energéticas foram lançadas, prendendo seus braços e pernas. Caleb tentou resistir, mas foi imobilizado.", "Oliver se aproximou com uma seringa. Sem hesitar, coletou uma amostra de sangue do braço de Caleb.\n\n— Isso... isso vai mudar tudo.\n\n— Você não vai conseguir... — murmurou Caleb, tentando soltar-se.\n\nOliver deu um sorriso torto.\n— Pelo menos eu vou conseguir entender por que o mundo sempre preferiu você. Até ela preferiu.", "Ele recuou para a porta.\n\n— Adeus, Caleb.\n\nEle fugiu, como um covarde, deixando seu antigo amigo cercado e enfraquecido.\n\nCaleb olhou ao redor. Os capangas se aproximavam, prontos para finalizar o serviço. Um deles começou a canalizar energia nas mãos — ela crepitava no ar com tons vermelho-escuros. Era poderoso.", "Mas Caleb fechou os olhos. Sentiu a tempestade dentro de si. Um trovão ecoou, e sua pele brilhou em roxo.\n\n— Se for para cair... vou levar vocês comigo.\n\nEle rugiu, liberando uma descarga brutal de energia púrpura que explodiu a sala. Os capangas foram lançados contra as paredes, desmaiando ou fugindo em pânico. Mas Caleb caiu de joelhos, cuspindo sangue.\n\nO poder o destruía por dentro. Mas ele não podia parar.", "Caleb cambaleou pelos corredores do prédio enquanto a tempestade roxa rugia do lado de fora. Seu corpo ardia. O poder que explodira dentro dele ainda vibrava em seus ossos, como se tivesse aberto pequenas fissuras em sua alma.\n\nAo alcançar a rua, sentiu os joelhos cederem, mas se forçou a continuar.\n\nFoi então que os cinco capangas de Oliver surgiram do nevoeiro púrpura da tempestade, formando um semicírculo à sua frente. Estavam com uniformes reforçados, respiradores e olhos cobertos por lentes negras. Cada um com uma arma diferente — lâminas, bastões energéticos, luvas de choque. Mercenários de elite.\n\n— Ele está fraco. Acabem com ele — ordenou um deles, o mais alto, chamado Kael.", "Caleb ergueu os olhos. Estava ofegante, tremendo, mas ainda com a tempestade dentro de si. Sentia a energia se acumulando no peito, nas pontas dos dedos. Mas usá-la o machucava. Cada descarga o rasgava por dentro.\n\n— Não precisam lutar... Eu só quero passar. Não quero ferir ninguém. — disse com a voz rouca.\n\nEles não responderam. Apenas avançaram.\n\nO primeiro veio rápido, com uma lâmina curva. Caleb se esquivou por pouco, tropeçando. Em reflexo, ergueu a mão, e um raio roxo explodiu da palma, atingindo o agressor no peito. Ele foi lançado cinco metros para trás, inconsciente.", "O segundo e o terceiro vieram juntos, tentando flanquá-lo. Caleb girou o corpo e cravou o punho no chão — uma onda de energia se espalhou em linha reta, empurrando os dois contra um carro estacionado. O veículo explodiu com o impacto, iluminando a rua com fogo lilás.\n\nMas o custo foi alto. Caleb caiu de joelhos, tossindo sangue. Suas veias pulsavam roxas, e ele mal conseguia enxergar direito.\n\nO quarto capanga, usando luvas amplificadoras, o socou no abdômen. Caleb voou e caiu sobre o asfalto molhado, gritando de dor. Tentou levantar, mas o quinto já vinha com um bastão elétrico, pronto para acabar com tudo.\n\nNum último esforço, Caleb canalizou tudo o que restava. Suas pupilas sumiram. Seu corpo brilhou, como se fosse feito de trovão.", "— RAAAAHHH!\n\nUm círculo de energia se expandiu dele, lançando os dois capangas que restavam para longe. Um deles atravessou a vitrine de uma loja. O outro rolou até bater em um poste, desacordado.\n\nSilêncio.\n\nA chuva ainda caía, mas Caleb não a sentia mais.", "Ele tentou se manter de pé. Conseguiu dar três passos... e então caiu de rosto no chão, respirando com dificuldade.\n\n— Não... posso... parar agora...\n\nAntes que a consciência o deixasse por completo, ele olhou para o céu roxo, com os olhos embargados de raiva.\n\n— Oliver... isso não vai acabar assim...", "E então desmaiou."];
+$('fontSize').addEventListener('input',e=>{$('readText').style.fontSize=e.target.value+'px';store.set('sf_font',e.target.value)});$('fontSize').value=store.get('sf_font')||'19';$('readText').style.fontSize=$('fontSize').value+'px';
+let page=Math.min(Math.max(Number(store.get('sf_page'))||0,0),pages.length-1);
+let isReading=false;
+function stopReading(){if('speechSynthesis' in window)window.speechSynthesis.cancel();isReading=false;$('readAloud').textContent='🔊 Ler em voz alta';$('voiceStatus').textContent='Narração pelo navegador';if(musicWasPlayingBeforeVoice){soundtrack.play().catch(()=>{});musicWasPlayingBeforeVoice=false}}
+function startReading(){if(!('speechSynthesis' in window)){$('voiceStatus').textContent='A narração não está disponível neste aparelho';return}const utterance=new SpeechSynthesisUtterance(pages[page]);utterance.lang='pt-BR';utterance.rate=.92;utterance.pitch=1;utterance.onend=stopReading;utterance.onerror=()=>{$('voiceStatus').textContent='Não foi possível iniciar a narração';isReading=false;$('readAloud').textContent='🔊 Tentar novamente'};window.speechSynthesis.cancel();musicWasPlayingBeforeVoice=!soundtrack.paused;if(musicWasPlayingBeforeVoice)soundtrack.pause();window.speechSynthesis.speak(utterance);isReading=true;$('readAloud').textContent='■ Parar leitura';$('voiceStatus').textContent=`Lendo página ${page+1}`}
+$('readAloud').addEventListener('click',()=>isReading?stopReading():startReading());
+function renderRead(){$('readText').textContent=pages[page];$('readCount').textContent=`Página ${page+1} de ${pages.length}`;$('readMeter').style.width=`${100*(page+1)/pages.length}%`;$('readNext').textContent=page===pages.length-1?'Voltar ao início ↺':'Próxima página →';$('readPrev').disabled=page===0}
+$('readPrev').addEventListener('click',()=>{stopReading();page=Math.max(0,page-1);store.set('sf_page',page);renderRead()});$('readNext').addEventListener('click',()=>{stopReading();page=(page+1)%pages.length;store.set('sf_page',page);renderRead()});$('readRestart').addEventListener('click',()=>{stopReading();page=0;store.set('sf_page',page);renderRead()});
+const scenes={start:{text:'A chuva invade a sala de aula. Oliver está diante de Caleb. O estrondo de um relâmpago abafa qualquer palavra. Qual é sua primeira atitude?',choices:[['Tentar conversar com Oliver','talk'],['Observar a saída e os perigos','observe']]},talk:{text:'Caleb tenta encontrar no rosto de Oliver um sinal do amigo que conheceu. Por um segundo, a tensão dá lugar ao silêncio. O que você pergunta?',choices:[['“O que aconteceu com a nossa amizade?”','memory'],['“Por que você me trouxe até aqui?”','motive']]},observe:{text:'Você percebe vidro espalhado perto da porta e uma janela golpeada pelo vento. Oliver acompanha seus movimentos, desconfiado. O que faz?',choices:[['Voltar a atenção para Oliver','talk'],['Ficar perto da parede, longe dos cacos','safe']]},memory:{text:'“Você ainda se lembra de quem éramos?”, Caleb pergunta. Um trovão interrompe a resposta. Por enquanto, nenhum dos dois baixa a guarda. Fim desta rota alternativa.',choices:[['Jogar novamente','start']]},motive:{text:'Oliver demora a responder. A tempestade parece se aproximar, e Caleb percebe que algumas respostas custam mais do que uma luta. Fim desta rota alternativa.',choices:[['Jogar novamente','start']]},safe:{text:'Caleb se afasta dos cacos. A segurança dura pouco: Oliver dá um passo à frente e o confronto de palavras recomeça. Fim desta rota alternativa.',choices:[['Jogar novamente','start']]}};
+let scene='start';function renderScene(){const s=scenes[scene];$('sceneText').textContent=s.text;$('sceneChoices').replaceChildren();s.choices.forEach(([label,next])=>{const b=document.createElement('button');b.className='btn';b.textContent=label;b.addEventListener('click',()=>{scene=next;renderScene()});$('sceneChoices').append(b)})}
+const quiz=[{q:'Qual é a cor dos relâmpagos na abertura?',a:['Verde','Roxa','Dourada'],correct:1},{q:'Quem está diante de Caleb no colégio?',a:['Oliver','Eron','Kaien'],correct:0},{q:'Onde Caleb e Oliver se encaram?',a:['Num estádio','Numa estação','Numa sala de aula de um colégio abandonado'],correct:2},{q:'O que Oliver coleta do braço de Caleb?',a:['Uma amostra de sangue','Uma impressão digital','Um pedaço de tecido'],correct:0},{q:'Como se chama o mercenário que manda atacar Caleb na rua?',a:['Eron','Kael','Lazhar'],correct:1},{q:'O que Caleb diz antes de desmaiar?',a:['A tempestade acabou','Adeus, Lysandra','Oliver... isso não vai acabar assim...'],correct:2}];let qi=0,score=0,answered=false;
+function renderQuiz(){if(qi===quiz.length){$('quizProgress').textContent='Fim do desafio';$('quizQuestion').textContent=`Você acertou ${score} de ${quiz.length}!`;$('quizOptions').replaceChildren();$('quizFeedback').textContent=score===quiz.length?'Você conhece o começo da tempestade!':'Que tal reler a prévia e tentar outra vez?';$('quizNext').textContent='Recomeçar ↺';$('quizNext').classList.remove('hidden');return}const q=quiz[qi];$('quizProgress').textContent=`Pergunta ${qi+1} de ${quiz.length} • ${score} acerto(s)`;$('quizQuestion').textContent=q.q;$('quizFeedback').textContent='';$('quizNext').classList.add('hidden');$('quizNext').textContent='Próxima →';$('quizOptions').replaceChildren();q.a.forEach((ans,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=ans;b.disabled=answered;b.addEventListener('click',()=>{if(answered)return;answered=true;if(i===q.correct)score++;$('quizFeedback').textContent=i===q.correct?'✓ Acertou!':`Resposta correta: ${q.a[q.correct]}`;$('quizOptions').querySelectorAll('button').forEach(btn=>btn.disabled=true);$('quizNext').classList.remove('hidden')});$('quizOptions').append(b)})}
+$('quizNext').addEventListener('click',()=>{if(qi===quiz.length){qi=0;score=0}else{qi++}answered=false;renderQuiz()});
+renderRead();renderScene();renderQuiz();go(location.hash.slice(1)||'home',{history:false});
+})();
+</script>
+</body>
+</html>
