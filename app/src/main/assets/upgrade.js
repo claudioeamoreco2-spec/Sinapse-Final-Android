@@ -1,66 +1,616 @@
-(()=>{'use strict';
-const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
-const save=(k,v)=>localStorage.setItem('sf2_'+k,JSON.stringify(v));
-const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem('sf2_'+k));return v??d}catch{return d}};
-const state=load('state',{name:'Jogador',xp:0,points:0,chapter:1,unlocked:['caleb','oliver','kaelum','cibele'],scenes:1,bestRace:0,puzzle:false,quiz:false});
-const persist=()=>save('state',state);let readerSize=load('readerSize',19);
-const chars=[
-{id:'caleb',name:'Caleb',role:'Protagonista',img:'characters/caleb.svg',unlock:1,power:'Energia kriptante',age:'17 anos',bio:'Estratégico, leal e intenso. Sobreviveu ao impacto da tempestade roxa e agora carrega uma força que pode salvar Nerakar ou destruí-lo por dentro.',fact:'O poder não está no sangue: o corpo de Caleb é apenas o recipiente.'},
-{id:'oliver',name:'Oliver',role:'Rival',img:'characters/oliver.svg',unlock:1,power:'Tecnologia e artefatos',age:'18 anos',bio:'Antigo melhor amigo de Caleb. Brilhante, calculista e ferido pelo passado, transforma inteligência e ressentimento em uma campanha para controlar Nerakar.',fact:'Ele ainda salva Caleb no passado, revelando que sua humanidade não desapareceu por completo.'},
-{id:'kaelum',name:'Kaelum',role:'Deus da tempestade',img:'characters/kaelum.svg',unlock:1,power:'Tempestade primordial',age:'Incalculável',bio:'Uma divindade incompreensível: às vezes salvadora, às vezes cruel. Sua fumaça e sua energia mudaram a tecnologia e o destino do mundo.',fact:'Kaelum não cabe nas ideias humanas de herói ou vilão.'},
-{id:'cibele',name:'Cibele',role:'Sobrevivente',img:'characters/eron.svg',unlock:1,power:'Coragem e estratégia',age:'Desconhecida',bio:'Resgatada durante o colapso de Nerakar. Inteligente, prática e capaz de sobreviver quando tudo ao redor desmorona.',fact:'É uma das primeiras pessoas que Caleb decide proteger depois de despertar.'},
-{id:'lira',name:'Lira',role:'Garota fantasma',img:'characters/kaelum.svg',unlock:2,power:'Cura e presença espectral',age:'13 anos',bio:'Uma garota misteriosa que encontra Caleb ferido e acelera sua recuperação. Sabe mais sobre ele do que deveria.',fact:'Sua verdadeira natureza será revelada somente depois do encontro com Eron.'},
-{id:'eron',name:'Eron Valemont',role:'Sobrevivente da Sinapse',img:'characters/eron.svg',unlock:3,power:'45 ecos mentais',age:'Desconhecida',bio:'Único sobrevivente da fusão de quarenta e cinco condenados. Carrega gênios, soldados e assassinos dentro da própria mente.',fact:'A própria família Valemont financiou a máquina Sinapse Final.'},
-{id:'lazhar',name:'Lazhar',role:'Hacker',img:'characters/oliver.svg',unlock:3,power:'Tecnologia corporal',age:'Desconhecida',bio:'O mais inquieto dos cinco fugitivos. Conecta o próprio corpo a sistemas e controla discos defensivos.',fact:'É um dos aliados mais próximos de Oliver.'},
-{id:'miro',name:'Miro',role:'Infiltrador',img:'characters/caleb.svg',unlock:3,power:'Pele de obsidiana',age:'Desconhecida',bio:'Silencioso e preciso. Sabe apagar sua presença até mesmo de sensores térmicos.',fact:'Quando endurece o corpo, torna-se um escudo vivo.'},
-{id:'tharn',name:'Tharn',role:'Brutamontes',img:'characters/eron.svg',unlock:4,power:'Armadura orgânica',age:'Desconhecida',bio:'Seu corpo produz placas vivas extremamente resistentes. A violência parece natural para ele.',fact:'O Anel de Tharzul o fez encarar a própria fome por destruição.'},
-{id:'eko',name:'Eko',role:'Manipulador gravitacional',img:'characters/caleb.svg',unlock:4,power:'Gravidade',age:'Desconhecida',bio:'Pequeno, silencioso e perigoso. Altera o peso e a direção dos objetos ao redor.',fact:'A lembrança de Maea é seu ponto de ruptura.'},
-{id:'mirael',name:'Mirael',role:'Controladora',img:'characters/oliver.svg',unlock:4,power:'Armas e mente',age:'Desconhecida',bio:'Transforma objetos que segura em armas e domina mentes, embora não confie na própria memória.',fact:'O Anel revelou que sua mente sempre foi uma mentira.'},
-{id:'tharzul',name:'Tharzul',role:'Rei-templário',img:'characters/kaelum.svg',unlock:4,power:'Julgamento brilhante',age:'Lenda antiga',bio:'Criador do anel que revela pecados possíveis e transfere a culpa de suas vítimas ao portador.',fact:'Seu julgamento perfeito destruiu todos ao redor — inclusive ele mesmo.'},
-{id:'kael',name:'Kael',role:'Mercenário',img:'characters/oliver.svg',unlock:2,power:'Energia vermelha',age:'Desconhecida',bio:'Líder de campo dos mercenários enviados contra Caleb nas ruas de Nerakar.',fact:'Foi o primeiro inimigo nomeado a cercar Caleb.'},
-{id:'lisandra',name:'Lisandra',role:'Laço perdido',img:'characters/caleb.svg',unlock:5,power:'Memórias apagadas',age:'Desconhecida',bio:'Parte central do passado de Caleb e Oliver. Seu desaparecimento aprofundou a ruptura entre os dois.',fact:'Kaelum apaga suas memórias depois da morte de sua família.'},
-{id:'axel',name:'Axel',role:'Filho adotivo de Sael',img:'characters/eron.svg',unlock:5,power:'Fúria berserker',age:'Desconhecida',bio:'Carrega uma raiva capaz de romper seus próprios limites.',fact:'Sua história começa ligada ao herói militar entrevistado antes do apagão.'},
-{id:'kaien',name:'Kaien',role:'Dragão Dourado',img:'characters/caleb.svg',unlock:5,power:'Ouro do dragão',age:'Desconhecida',bio:'Lutador sem poderes que perdeu a luta da vida, morreu e foi trazido de volta por Harkan.',fact:'Só poderá ser livre quando matar Caleb.'},
-{id:'sael',name:'Sael',role:'Pai de Caleb',img:'characters/eron.svg',unlock:6,power:'Segredo corrompido',age:'Desconhecida',bio:'Uma figura essencial no passado de Caleb e na manipulação que envolve Harkan.',fact:'A verdade sobre ele muda a leitura de toda a família de Caleb.'},
-{id:'harkan',name:'Harkan',role:'Controlador',img:'characters/oliver.svg',unlock:6,power:'Domínio do Dragão',age:'Desconhecida',bio:'Trouxe Kaien de volta à vida e amarrou sua liberdade a uma missão mortal.',fact:'Sua ajuda nunca vem sem correntes.'},
-{id:'baltazar',name:'Baltazar',role:'Pai de Oliver',img:'characters/kaelum.svg',unlock:7,power:'Fusão em massa',age:'Desconhecida',bio:'Inimigo ligado à Sinapse Final, capaz de carregar milhões de presenças em si.',fact:'É o pai de Oliver e uma ameaça até para os deuses.'},
-{id:'nids',name:'Nids',role:'Divindade',img:'characters/kaelum.svg',unlock:8,power:'Desconhecido',age:'Eterno',bio:'Uma das forças divinas do universo de Sinapse Final.',fact:'Faz parte da cosmologia ao lado de Thar, Giro e Kaelum.'},
-{id:'giro',name:'Giro',role:'Divindade',img:'characters/kaelum.svg',unlock:8,power:'Desconhecido',age:'Eterno',bio:'Presença divina ainda envolta em mistério.',fact:'Sua influência será revelada em capítulos futuros.'},
-{id:'thar',name:'Thar',role:'Olho do Julgamento',img:'characters/kaelum.svg',unlock:4,power:'Verdade absoluta',age:'Eterno',bio:'Divindade esquecida venerada por Tharzul. Não exige preces, apenas verdades.',fact:'Sua essência alimenta o Anel de Tharzul.'}
-];
-// Cada integrante possui um retrato exclusivo recortado do atlas oficial do elenco.
-chars.forEach(character=>{character.img=`characters/v2/${character.id}.webp`});
-const ch=[
-{n:1,title:'O Brilho da Tempestade',sub:'Caleb contra Oliver em uma Nerakar destruída.',open:true},
-{n:2,title:'O Olho da Tempestade',sub:'Um ano antes: o raio escolhe Caleb e o mundo muda.',open:true},
-{n:3,title:'A Descoberta do Ponto Fraco',sub:'Lira, Eron e a origem da máquina Sinapse Final.',open:true},
-{n:4,title:'O Anel de Tharzul',sub:'Os cinco fugitivos encaram o julgamento perfeito.',open:true}
-];
-let importedChapters=[];
-const excerpts={
-2:[`O mundo nem sempre foi assim. Antes da tempestade, Kaelum lançou através de um vulcão uma fumaça que fugia à explicação da ciência. As cidades transformaram aquela presença em tecnologia — máquinas, implantes e sistemas que aprendiam sozinhos. Então o céu rasgou.`,`Caleb caminhava pelas ruas quando as nuvens giraram. O azul virou roxo. Um raio púrpura o atingiu no peito e o lançou num vazio sem céu, chão ou tempo. Ali, uma consciência falou dentro dele: sobreviva, ou eu tomo o que sobrar.`,`Quando acordou, trovões dançavam em seus dedos. Oliver chegou sob a chuva e viu o impossível pela primeira vez. Mais tarde, juntos, salvaram Cibele de criaturas de carne e metal e correram para um bunker escondido.`,`No bunker, Caleb encontrou sinais de recrutamento forçado, testes e prisioneiros. A amizade rachou. Caleb saiu carregando Cibele, enquanto a tempestade parecia rir dos dois antigos irmãos.`],
-3:[`Caleb desperta numa casa de madeira depois de dois dias inconsciente. Cibele está viva. Ao lado do colchão, uma garota chamada Lira troca seus curativos e diz que sabia que ele precisava voltar.`,`Lira revela que consegue sentir ferimentos e acelerar a recuperação. Na floresta, os dois encontram um velho impossível de mover. Ele segura Lira, derruba Caleb com uma garrafa e o aprisiona.`,`O velho é Eron Valemont. Uma visão mostra a máquina Sinapse Final fundindo quarenta e cinco pessoas em seu corpo. Engenheiros, soldados e assassinos agora existem como ecos dentro dele.`,`Eron testa o sangue de Caleb, mas encontra um corpo comum: a tempestade não é genética. Enquanto isso, Oliver reúne os cinco fugitivos e prepara o Núcleo de Kaelum.`],
-4:[`Lazhar e Miro chegam à Zona Morta em busca do Condutor Elemental. O hacker rompe a rede da vila; Miro apaga a presença e atravessa sensores como um fantasma.`,`O Condutor ativa uma armadilha. Lazhar usa discos de energia e invade armas inimigas. Miro endurece a pele como obsidiana. Eles escapam com a peça.`,`Tharn, Eko e Mirael fracassam diante do Anel de Tharzul. A relíquia não mostra ilusões: ela revela o que cada um fez e tudo que ainda poderia fazer.`,`O anel foi criado para produzir justiça perfeita. Alimentado pela culpa de milhares, enlouqueceu o rei Tharzul. Agora continua pulsando nas profundezas de Nerakar, esperando alguém capaz de suportar sua verdade.`]
-};
-function toast(t){let x=q('.toast');if(!x){x=document.createElement('div');x.className='toast';document.body.append(x)}x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
-function reward(points,msg){state.points+=points;state.xp+=points;while(state.xp>=100){state.xp-=100;state.chapter++;toast('Nível aumentado!')}persist();refreshHome();toast(`+${points} pontos • ${msg}`)}
-function refreshHome(){const n=q('#homeName'),p=q('#homePoints'),l=q('#homeLevel'),bar=q('#homeXp');if(n)n.textContent=state.name;if(p)p.textContent=state.points+' pontos';if(l)l.textContent='Nível '+state.chapter;if(bar)bar.style.width=state.xp+'%'}
-q('#home').insertAdjacentHTML('afterbegin',`<div class="game-home"><div class="logo">SINAPSE<span>ϟ</span><br>FINAL</div><div class="tagline">O destino desperta na tempestade</div><div class="player-chip"><div class="avatar">C</div><div><strong id="homeName"></strong><small><span id="homeLevel"></span> • <span id="homePoints"></span></small><div class="xp"><i id="homeXp"></i></div></div></div><div class="main-menu"><button class="menu-btn primary" data-go="story">Continuar história</button><button class="menu-btn" data-go="arcade">Jogar</button><button class="menu-btn" data-go="characters">Personagens</button><button class="menu-btn" data-go="profile">Login e perfil</button></div></div>`);
-function renderStoryLibrary(){const books=importedChapters.length?importedChapters:ch.map(c=>({number:c.n,title:c.title,pages:new Array(c.n===1?15:4),text:c.sub}));q('#story').innerHTML=`<header class="screen-head"><div class="eyebrow">Modo história</div><h1>Arquivo de Nerakar</h1><p class="lead">Leia o livro, descubra cenas e libere personagens.</p></header><div class="stat-row"><div class="stat"><strong>${books.length}</strong><span>capítulos</span></div><div class="stat"><strong id="sceneCount">${state.scenes}/${books.length*4}</strong><span>cenas</span></div><div class="stat"><strong>${state.unlocked.length}/22</strong><span>códice</span></div></div><div class="section-title"><h2>Capítulos</h2><small>texto integral do autor</small></div><div class="chapter-list">${books.map(c=>`<button class="chapter-tile" data-chapter="${c.number}"><span class="status">${c.number===1?'15':c.pages.length} páginas</span><div class="eyebrow">Capítulo ${c.number}</div><h2>${c.title}</h2><p>${c.number===1?'O confronto que iniciou a tempestade.':c.text.slice(0,115).replace(/\s+/g,' ')}…</p></button>`).join('')}</div><div class="section-title"><h2>Cenas conquistadas</h2><small>toque para ampliar</small></div><div class="scene-strip">${['Nerakar em alerta','O raio escolhe Caleb','O vazio púrpura','Resgate de Cibele'].map((x,i)=>`<button class="scene-thumb" data-scene="${i+1}"><b>${x}</b></button>`).join('')}</div>`}
-renderStoryLibrary();
-fetch('chapters.json').then(response=>response.json()).then(book=>{importedChapters=book.chapters;renderStoryLibrary()}).catch(()=>toast('O livro não pôde ser carregado'));
-q('#arcade').innerHTML=`<header class="screen-head"><div class="eyebrow">Central de jogos</div><h1>Treine. Corra. Descubra.</h1><p class="lead">Ganhe pontos para desbloquear o códice.</p></header><div class="mode-list"><button class="game-mode" data-play="race"><span class="icon">🏎</span><span><h3>Fuga de Nerakar</h3><p>Desvie dos destroços sob a tempestade.</p></span><b>+XP</b></button><button class="game-mode" data-play="puzzle"><span class="icon">◈</span><span><h3>Sinapses</h3><p>Encontre os pares do universo.</p></span><b>+80</b></button><button class="game-mode" data-go="quiz"><span class="icon">✦</span><span><h3>Quiz da tempestade</h3><p>Teste o que aprendeu no capítulo 1.</p></span><b>+60</b></button><button class="game-mode" data-go="game"><span class="icon">ϟ</span><span><h3>Escolhas sob a chuva</h3><p>Uma rota narrativa alternativa.</p></span><b>Jogar</b></button></div><div id="gameStage"></div>`;
-function renderCodex(){q('#characters').innerHTML=`<header class="screen-head"><div class="eyebrow">Conheça o universo</div><h1>Personagens • ${state.unlocked.length}/22</h1><p class="lead">Leia capítulos e jogue para liberar arquivos.</p></header><div class="codex-grid">${chars.map(c=>{const open=state.unlocked.includes(c.id)||state.chapter>=c.unlock;return `<button class="codex-card ${open?'':'locked'}" data-char="${c.id}" ${open?'':'disabled'}><img src="${c.img}" alt="${open?'Retrato de '+c.name:'Personagem bloqueado'}"><div class="info"><h3>${open?c.name:'Arquivo bloqueado'}</h3><small>${open?c.role:'Disponível no nível '+c.unlock}</small></div></button>`}).join('')}</div>`}
-function showChar(id){const c=chars.find(x=>x.id===id);if(!c)return;q('#characterDetail').innerHTML=`<button class="back" data-go="characters">← Voltar ao códice</button><img class="detail-hero" src="${c.img}" alt="Retrato de ${c.name}"><header class="screen-head"><div class="eyebrow">${c.role}</div><h1>${c.name}</h1><div class="detail-data"><span>${c.age}</span><span>${c.power}</span></div></header><article class="card lore"><h2>Arquivo</h2><p>${c.bio}</p><h2>Curiosidade desbloqueada</h2><p>${c.fact}</p></article>`;const t=document.createElement('button');t.dataset.go='characterDetail';document.body.append(t);t.click();t.remove()}
-q('#profile').innerHTML=`<header class="screen-head"><div class="eyebrow">Identidade do jogador</div><h1>Login e perfil</h1></header><div class="profile-card"><div class="player-chip"><div class="avatar">C</div><div><strong id="profileName"></strong><small id="profileStats"></small></div></div><label class="field">Nome do jogador<input id="nameInput" maxlength="20" autocomplete="nickname"></label><button class="btn primary" id="saveProfile">Salvar perfil</button><p class="small">O perfil funciona offline e fica salvo somente neste aparelho.</p></div><div class="section-title"><h2>Conquistas</h2><small>arquivo pessoal</small></div><div><div class="achievement"><i>ϟ</i><div><b>Primeiro impacto</b><small> Abra o modo história</small></div></div><div class="achievement ${state.puzzle?'':'locked'}"><i>◈</i><div><b>Mente sincronizada</b><small> Complete o quebra-cabeça</small></div></div><div class="achievement ${state.bestRace>=15?'':'locked'}"><i>🏎</i><div><b>Fuga perfeita</b><small> Marque 15 pontos na corrida</small></div></div></div>`;
-function profilePaint(){q('#profileName').textContent=state.name;q('#profileStats').textContent=`Nível ${state.chapter} • ${state.points} pontos`;q('#nameInput').value=state.name}
-q('#saveProfile').addEventListener('click',()=>{const v=q('#nameInput').value.trim();if(v)state.name=v;persist();profilePaint();refreshHome();toast('Perfil salvo')});
-function navigate(id){const button=document.createElement('button');button.dataset.go=id;document.body.append(button);button.click();button.remove()}
-function openChapter(n){if(n===1){navigate('read');return}const chapter=importedChapters.find(c=>c.number===n);const parts=chapter?.pages||excerpts[n];if(!parts){toast('Capítulo indisponível');return}let i=Math.min(load(`chapter_${n}_page`,0),parts.length-1);const title=chapter?.title||ch.find(c=>c.n===n)?.title||`Capítulo ${n}`;const render=()=>{q('#chapterReader').innerHTML=`<button class="back" data-go="story">← Capítulos</button><div class="reader-shell"><header class="screen-head"><div class="eyebrow">Capítulo ${n} • página ${i+1}/${parts.length}</div><h1>${title}</h1></header><article class="card chapter" style="font-size:${readerSize}px;white-space:pre-line">${parts[i]}</article><div class="book-panel"><label>Tamanho da letra</label><input id="upgradeFont" type="range" min="16" max="28" value="${readerSize}"></div><div class="reader-actions"><button class="btn alt" id="uPrev">←</button><button class="btn alt" id="uVoice">🔊 Voz</button><button class="btn primary" id="uNext">${i===parts.length-1?'Concluir':'Próxima →'}</button></div></div>`;q('#upgradeFont').oninput=e=>{readerSize=+e.target.value;save('readerSize',readerSize);q('#chapterReader .chapter').style.fontSize=readerSize+'px'};q('#uPrev').onclick=()=>{i=Math.max(0,i-1);save(`chapter_${n}_page`,i);render()};q('#uVoice').onclick=()=>speak(parts[i]);q('#uNext').onclick=()=>{if(i<parts.length-1){i++;save(`chapter_${n}_page`,i);render()}else{state.scenes=Math.max(state.scenes,n*4);const unlocks=chars.filter(c=>c.unlock<=n).map(c=>c.id);state.unlocked=[...new Set([...state.unlocked,...unlocks])];persist();reward(50,`Capítulo ${n} concluído`);renderCodex();renderStoryLibrary();navigate('story')}}};navigate('chapterReader');render()}
-let speech=null;function speak(text){if(!('speechSynthesis'in window)){toast('Voz indisponível neste celular');return}speechSynthesis.cancel();speech=new SpeechSynthesisUtterance(text);speech.lang='pt-BR';speech.rate=.92;speechSynthesis.speak(speech);toast('Narração iniciada')}
-function race(){q('#gameStage').innerHTML=`<div class="section-title"><h2>Fuga de Nerakar</h2><small>toque nas setas</small></div><div class="race"><div class="race-hud"><span id="raceScore">0</span><span id="raceTime">30s</span></div><div class="road"></div><div class="car"></div></div><div class="race-controls"><button id="left">←</button><button id="right">→</button></div>`;let lane=1,score=0,time=30,run=true;const car=q('.car'),area=q('.race');const move=d=>{lane=Math.max(0,Math.min(2,lane+d));car.style.left=`calc(${30+lane*20}% - 22px)`};q('#left').onclick=()=>move(-1);q('#right').onclick=()=>move(1);const spawn=setInterval(()=>{if(!run)return;const o=document.createElement('div');o.className='obstacle';const ol=Math.floor(Math.random()*3);o.style.left=`calc(${30+ol*20}% - 21px)`;area.append(o);let y=-70;const fall=setInterval(()=>{y+=8;o.style.top=y+'px';if(y>area.clientHeight-115&&y<area.clientHeight-25&&ol===lane){run=false;clearInterval(fall);o.remove();finish()}else if(y>area.clientHeight){clearInterval(fall);o.remove();score++;q('#raceScore').textContent=score}},45)},720);const timer=setInterval(()=>{time--;q('#raceTime').textContent=time+'s';if(time<=0){run=false;finish()}},1000);function finish(){if(!q('.race'))return;clearInterval(spawn);clearInterval(timer);state.bestRace=Math.max(state.bestRace,score);persist();reward(Math.min(100,score*5),'Corrida concluída');q('#gameStage').insertAdjacentHTML('beforeend',`<div class="card"><h2>Fim da corrida</h2><p>${score} destroços superados.</p><button class="btn primary" data-play="race">Jogar novamente</button></div>`)}}
-function puzzle(){const icons=['ϟ','◈','⚙','☄','ϟ','◈','⚙','☄'].sort(()=>Math.random()-.5);q('#gameStage').innerHTML=`<div class="section-title"><h2>Sinapses</h2><small>encontre os pares</small></div><div class="puzzle-board">${icons.map((x,i)=>`<button class="puzzle-card" data-i="${i}" data-v="${x}">${x}</button>`).join('')}</div><p class="small">Cada par restaura uma parte do arquivo de Nerakar.</p>`;let open=[],done=0;qa('.puzzle-card').forEach(c=>c.onclick=()=>{if(c.classList.contains('open')||open.length===2)return;c.classList.add('open');open.push(c);if(open.length===2)setTimeout(()=>{if(open[0].dataset.v===open[1].dataset.v){open.forEach(x=>x.classList.add('done'));done+=2;if(done===8){state.puzzle=true;persist();reward(80,'Sinapses restauradas')}}else open.forEach(x=>x.classList.remove('open'));open=[]},500)})}
-document.addEventListener('click',e=>{const chapterButton=e.target.closest('[data-chapter]');if(chapterButton){openChapter(+chapterButton.dataset.chapter);return}const c=e.target.closest('[data-char]');if(c){showChar(c.dataset.char);return}const p=e.target.closest('[data-play]');if(p){p.dataset.play==='race'?race():puzzle();q('#gameStage').scrollIntoView({behavior:'smooth'})}const s=e.target.closest('[data-scene]');if(s){toast('Cena ampliada • legenda liberada');s.classList.toggle('expanded')}});
-const observer=new MutationObserver(()=>{const visible=qa('.page:not(.hidden)')[0];if(!visible)return;if(visible.id==='characters')renderCodex();if(visible.id==='profile')profilePaint();if(visible.id==='story'){state.scenes=Math.max(state.scenes,1);persist()}});observer.observe(q('main'),{subtree:true,attributes:true,attributeFilter:['class']});
-renderCodex();profilePaint();refreshHome();
+(() => {
+  "use strict";
+  const q = (s) => document.querySelector(s),
+    qa = (s) => [...document.querySelectorAll(s)];
+  const save = (k, v) => localStorage.setItem("sf2_" + k, JSON.stringify(v));
+  const load = (k, d) => {
+    try {
+      const v = JSON.parse(localStorage.getItem("sf2_" + k));
+      return v ?? d;
+    } catch {
+      return d;
+    }
+  };
+  const state = load("state", {
+    name: "Jogador",
+    xp: 0,
+    points: 0,
+    chapter: 1,
+    unlocked: ["caleb", "oliver", "kaelum", "cibele"],
+    scenes: 1,
+    bestRace: 0,
+    puzzle: false,
+    quiz: false,
+  });
+  const persist = () => save("state", state);
+  let readerSize = load("readerSize", 19);
+  const chars = [
+    {
+      id: "caleb",
+      name: "Caleb",
+      role: "Protagonista",
+      img: "characters/caleb.svg",
+      unlock: 1,
+      power: "Energia kriptante",
+      age: "17 anos",
+      bio: "Estratégico, leal e intenso. Sobreviveu ao impacto da tempestade roxa e agora carrega uma força que pode salvar Nerakar ou destruí-lo por dentro.",
+      fact: "O poder não está no sangue: o corpo de Caleb é apenas o recipiente.",
+    },
+    {
+      id: "oliver",
+      name: "Oliver",
+      role: "Rival",
+      img: "characters/oliver.svg",
+      unlock: 1,
+      power: "Tecnologia e artefatos",
+      age: "18 anos",
+      bio: "Antigo melhor amigo de Caleb. Brilhante, calculista e ferido pelo passado, transforma inteligência e ressentimento em uma campanha para controlar Nerakar.",
+      fact: "Ele ainda salva Caleb no passado, revelando que sua humanidade não desapareceu por completo.",
+    },
+    {
+      id: "kaelum",
+      name: "Kaelum",
+      role: "Deus da tempestade",
+      img: "characters/kaelum.svg",
+      unlock: 1,
+      power: "Tempestade primordial",
+      age: "Incalculável",
+      bio: "Uma divindade incompreensível: às vezes salvadora, às vezes cruel. Sua fumaça e sua energia mudaram a tecnologia e o destino do mundo.",
+      fact: "Kaelum não cabe nas ideias humanas de herói ou vilão.",
+    },
+    {
+      id: "cibele",
+      name: "Cibele",
+      role: "Sobrevivente",
+      img: "characters/eron.svg",
+      unlock: 1,
+      power: "Coragem e estratégia",
+      age: "Desconhecida",
+      bio: "Resgatada durante o colapso de Nerakar. Inteligente, prática e capaz de sobreviver quando tudo ao redor desmorona.",
+      fact: "É uma das primeiras pessoas que Caleb decide proteger depois de despertar.",
+    },
+    {
+      id: "lira",
+      name: "Lira",
+      role: "Garota fantasma",
+      img: "characters/kaelum.svg",
+      unlock: 2,
+      power: "Cura e presença espectral",
+      age: "13 anos",
+      bio: "Uma garota misteriosa que encontra Caleb ferido e acelera sua recuperação. Sabe mais sobre ele do que deveria.",
+      fact: "Sua verdadeira natureza será revelada somente depois do encontro com Eron.",
+    },
+    {
+      id: "eron",
+      name: "Eron Valemont",
+      role: "Sobrevivente da Sinapse",
+      img: "characters/eron.svg",
+      unlock: 3,
+      power: "45 ecos mentais",
+      age: "Desconhecida",
+      bio: "Único sobrevivente da fusão de quarenta e cinco condenados. Carrega gênios, soldados e assassinos dentro da própria mente.",
+      fact: "A própria família Valemont financiou a máquina Sinapse Final.",
+    },
+    {
+      id: "lazhar",
+      name: "Lazhar",
+      role: "Hacker",
+      img: "characters/oliver.svg",
+      unlock: 3,
+      power: "Tecnologia corporal",
+      age: "Desconhecida",
+      bio: "O mais inquieto dos cinco fugitivos. Conecta o próprio corpo a sistemas e controla discos defensivos.",
+      fact: "É um dos aliados mais próximos de Oliver.",
+    },
+    {
+      id: "miro",
+      name: "Miro",
+      role: "Infiltrador",
+      img: "characters/caleb.svg",
+      unlock: 3,
+      power: "Pele de obsidiana",
+      age: "Desconhecida",
+      bio: "Silencioso e preciso. Sabe apagar sua presença até mesmo de sensores térmicos.",
+      fact: "Quando endurece o corpo, torna-se um escudo vivo.",
+    },
+    {
+      id: "tharn",
+      name: "Tharn",
+      role: "Brutamontes",
+      img: "characters/eron.svg",
+      unlock: 4,
+      power: "Armadura orgânica",
+      age: "Desconhecida",
+      bio: "Seu corpo produz placas vivas extremamente resistentes. A violência parece natural para ele.",
+      fact: "O Anel de Tharzul o fez encarar a própria fome por destruição.",
+    },
+    {
+      id: "eko",
+      name: "Eko",
+      role: "Manipulador gravitacional",
+      img: "characters/caleb.svg",
+      unlock: 4,
+      power: "Gravidade",
+      age: "Desconhecida",
+      bio: "Pequeno, silencioso e perigoso. Altera o peso e a direção dos objetos ao redor.",
+      fact: "A lembrança de Maea é seu ponto de ruptura.",
+    },
+    {
+      id: "mirael",
+      name: "Mirael",
+      role: "Controladora",
+      img: "characters/oliver.svg",
+      unlock: 4,
+      power: "Armas e mente",
+      age: "Desconhecida",
+      bio: "Transforma objetos que segura em armas e domina mentes, embora não confie na própria memória.",
+      fact: "O Anel revelou que sua mente sempre foi uma mentira.",
+    },
+    {
+      id: "tharzul",
+      name: "Tharzul",
+      role: "Rei-templário",
+      img: "characters/kaelum.svg",
+      unlock: 4,
+      power: "Julgamento brilhante",
+      age: "Lenda antiga",
+      bio: "Criador do anel que revela pecados possíveis e transfere a culpa de suas vítimas ao portador.",
+      fact: "Seu julgamento perfeito destruiu todos ao redor — inclusive ele mesmo.",
+    },
+    {
+      id: "kael",
+      name: "Kael",
+      role: "Mercenário",
+      img: "characters/oliver.svg",
+      unlock: 2,
+      power: "Energia vermelha",
+      age: "Desconhecida",
+      bio: "Líder de campo dos mercenários enviados contra Caleb nas ruas de Nerakar.",
+      fact: "Foi o primeiro inimigo nomeado a cercar Caleb.",
+    },
+    {
+      id: "lisandra",
+      name: "Lisandra",
+      role: "Laço perdido",
+      img: "characters/caleb.svg",
+      unlock: 5,
+      power: "Memórias apagadas",
+      age: "Desconhecida",
+      bio: "Parte central do passado de Caleb e Oliver. Seu desaparecimento aprofundou a ruptura entre os dois.",
+      fact: "Kaelum apaga suas memórias depois da morte de sua família.",
+    },
+    {
+      id: "axel",
+      name: "Axel",
+      role: "Filho adotivo de Sael",
+      img: "characters/eron.svg",
+      unlock: 5,
+      power: "Fúria berserker",
+      age: "Desconhecida",
+      bio: "Carrega uma raiva capaz de romper seus próprios limites.",
+      fact: "Sua história começa ligada ao herói militar entrevistado antes do apagão.",
+    },
+    {
+      id: "kaien",
+      name: "Kaien",
+      role: "Dragão Dourado",
+      img: "characters/caleb.svg",
+      unlock: 5,
+      power: "Ouro do dragão",
+      age: "Desconhecida",
+      bio: "Lutador sem poderes que perdeu a luta da vida, morreu e foi trazido de volta por Harkan.",
+      fact: "Só poderá ser livre quando matar Caleb.",
+    },
+    {
+      id: "sael",
+      name: "Sael",
+      role: "Pai de Caleb",
+      img: "characters/eron.svg",
+      unlock: 6,
+      power: "Segredo corrompido",
+      age: "Desconhecida",
+      bio: "Uma figura essencial no passado de Caleb e na manipulação que envolve Harkan.",
+      fact: "A verdade sobre ele muda a leitura de toda a família de Caleb.",
+    },
+    {
+      id: "harkan",
+      name: "Harkan",
+      role: "Controlador",
+      img: "characters/oliver.svg",
+      unlock: 6,
+      power: "Domínio do Dragão",
+      age: "Desconhecida",
+      bio: "Trouxe Kaien de volta à vida e amarrou sua liberdade a uma missão mortal.",
+      fact: "Sua ajuda nunca vem sem correntes.",
+    },
+    {
+      id: "baltazar",
+      name: "Baltazar",
+      role: "Pai de Oliver",
+      img: "characters/kaelum.svg",
+      unlock: 7,
+      power: "Fusão em massa",
+      age: "Desconhecida",
+      bio: "Inimigo ligado à Sinapse Final, capaz de carregar milhões de presenças em si.",
+      fact: "É o pai de Oliver e uma ameaça até para os deuses.",
+    },
+    {
+      id: "nids",
+      name: "Nids",
+      role: "Divindade",
+      img: "characters/kaelum.svg",
+      unlock: 8,
+      power: "Desconhecido",
+      age: "Eterno",
+      bio: "Uma das forças divinas do universo de Sinapse Final.",
+      fact: "Faz parte da cosmologia ao lado de Thar, Giro e Kaelum.",
+    },
+    {
+      id: "giro",
+      name: "Giro",
+      role: "Divindade",
+      img: "characters/kaelum.svg",
+      unlock: 8,
+      power: "Desconhecido",
+      age: "Eterno",
+      bio: "Presença divina ainda envolta em mistério.",
+      fact: "Sua influência será revelada em capítulos futuros.",
+    },
+    {
+      id: "thar",
+      name: "Thar",
+      role: "Olho do Julgamento",
+      img: "characters/kaelum.svg",
+      unlock: 4,
+      power: "Verdade absoluta",
+      age: "Eterno",
+      bio: "Divindade esquecida venerada por Tharzul. Não exige preces, apenas verdades.",
+      fact: "Sua essência alimenta o Anel de Tharzul.",
+    },
+  ];
+  // Cada integrante possui um retrato exclusivo recortado do atlas oficial do elenco.
+  chars.forEach((character) => {
+    character.img = `characters/v2/${character.id}.webp`;
+  });
+  const ch = [
+    {
+      n: 1,
+      title: "O Brilho da Tempestade",
+      sub: "Caleb contra Oliver em uma Nerakar destruída.",
+      open: true,
+    },
+    {
+      n: 2,
+      title: "O Olho da Tempestade",
+      sub: "Um ano antes: o raio escolhe Caleb e o mundo muda.",
+      open: true,
+    },
+    {
+      n: 3,
+      title: "A Descoberta do Ponto Fraco",
+      sub: "Lira, Eron e a origem da máquina Sinapse Final.",
+      open: true,
+    },
+    {
+      n: 4,
+      title: "O Anel de Tharzul",
+      sub: "Os cinco fugitivos encaram o julgamento perfeito.",
+      open: true,
+    },
+  ];
+  let importedChapters = [];
+  const excerpts = {
+    2: [
+      `O mundo nem sempre foi assim. Antes da tempestade, Kaelum lançou através de um vulcão uma fumaça que fugia à explicação da ciência. As cidades transformaram aquela presença em tecnologia — máquinas, implantes e sistemas que aprendiam sozinhos. Então o céu rasgou.`,
+      `Caleb caminhava pelas ruas quando as nuvens giraram. O azul virou roxo. Um raio púrpura o atingiu no peito e o lançou num vazio sem céu, chão ou tempo. Ali, uma consciência falou dentro dele: sobreviva, ou eu tomo o que sobrar.`,
+      `Quando acordou, trovões dançavam em seus dedos. Oliver chegou sob a chuva e viu o impossível pela primeira vez. Mais tarde, juntos, salvaram Cibele de criaturas de carne e metal e correram para um bunker escondido.`,
+      `No bunker, Caleb encontrou sinais de recrutamento forçado, testes e prisioneiros. A amizade rachou. Caleb saiu carregando Cibele, enquanto a tempestade parecia rir dos dois antigos irmãos.`,
+    ],
+    3: [
+      `Caleb desperta numa casa de madeira depois de dois dias inconsciente. Cibele está viva. Ao lado do colchão, uma garota chamada Lira troca seus curativos e diz que sabia que ele precisava voltar.`,
+      `Lira revela que consegue sentir ferimentos e acelerar a recuperação. Na floresta, os dois encontram um velho impossível de mover. Ele segura Lira, derruba Caleb com uma garrafa e o aprisiona.`,
+      `O velho é Eron Valemont. Uma visão mostra a máquina Sinapse Final fundindo quarenta e cinco pessoas em seu corpo. Engenheiros, soldados e assassinos agora existem como ecos dentro dele.`,
+      `Eron testa o sangue de Caleb, mas encontra um corpo comum: a tempestade não é genética. Enquanto isso, Oliver reúne os cinco fugitivos e prepara o Núcleo de Kaelum.`,
+    ],
+    4: [
+      `Lazhar e Miro chegam à Zona Morta em busca do Condutor Elemental. O hacker rompe a rede da vila; Miro apaga a presença e atravessa sensores como um fantasma.`,
+      `O Condutor ativa uma armadilha. Lazhar usa discos de energia e invade armas inimigas. Miro endurece a pele como obsidiana. Eles escapam com a peça.`,
+      `Tharn, Eko e Mirael fracassam diante do Anel de Tharzul. A relíquia não mostra ilusões: ela revela o que cada um fez e tudo que ainda poderia fazer.`,
+      `O anel foi criado para produzir justiça perfeita. Alimentado pela culpa de milhares, enlouqueceu o rei Tharzul. Agora continua pulsando nas profundezas de Nerakar, esperando alguém capaz de suportar sua verdade.`,
+    ],
+  };
+  function toast(t) {
+    let x = q(".toast");
+    if (!x) {
+      x = document.createElement("div");
+      x.className = "toast";
+      document.body.append(x);
+    }
+    x.textContent = t;
+    x.classList.add("show");
+    setTimeout(() => x.classList.remove("show"), 1800);
+  }
+  function reward(points, msg) {
+    state.points += points;
+    state.xp += points;
+    while (state.xp >= 100) {
+      state.xp -= 100;
+      state.chapter++;
+      toast("Nível aumentado!");
+    }
+    persist();
+    refreshHome();
+    toast(`+${points} pontos • ${msg}`);
+  }
+  function refreshHome() {
+    const n = q("#homeName"),
+      p = q("#homePoints"),
+      l = q("#homeLevel"),
+      bar = q("#homeXp");
+    if (n) n.textContent = state.name;
+    if (p) p.textContent = state.points + " pontos";
+    if (l) l.textContent = "Nível " + state.chapter;
+    if (bar) bar.style.width = state.xp + "%";
+  }
+  q("#home").insertAdjacentHTML(
+    "afterbegin",
+    `<div class="game-home"><div class="logo">SINAPSE<span>ϟ</span><br>FINAL</div><div class="tagline">O destino desperta na tempestade</div><div class="player-chip"><div class="avatar">C</div><div><strong id="homeName"></strong><small><span id="homeLevel"></span> • <span id="homePoints"></span></small><div class="xp"><i id="homeXp"></i></div></div></div><div class="main-menu"><button class="menu-btn primary" data-go="story">Continuar história</button><button class="menu-btn" data-go="arcade">Jogar</button><button class="menu-btn" data-go="characters">Personagens</button><button class="menu-btn" data-go="profile">Login e perfil</button></div></div>`,
+  );
+  function renderStoryLibrary() {
+    const books = importedChapters.length
+      ? importedChapters
+      : ch.map((c) => ({
+          number: c.n,
+          title: c.title,
+          pages: new Array(c.n === 1 ? 15 : 4),
+          text: c.sub,
+        }));
+    q("#story").innerHTML =
+      `<header class="screen-head"><div class="eyebrow">Modo história</div><h1>Arquivo de Nerakar</h1><p class="lead">Leia o livro, descubra cenas e libere personagens.</p></header><div class="stat-row"><div class="stat"><strong>${books.length}</strong><span>capítulos</span></div><div class="stat"><strong id="sceneCount">${state.scenes}/${books.length * 4}</strong><span>cenas</span></div><div class="stat"><strong>${state.unlocked.length}/22</strong><span>códice</span></div></div><div class="section-title"><h2>Capítulos</h2><small>texto integral do autor</small></div><div class="chapter-list">${books.map((c) => `<button class="chapter-tile" data-chapter="${c.number}" style="background-image:linear-gradient(0deg,rgba(7,5,16,.96),rgba(7,5,16,.08) 72%),url('scenes/chapters/chapter-${c.number}.webp')"><span class="status">${c.pages.length} páginas</span><div class="eyebrow">Capítulo ${c.number}</div><h2>${c.title}</h2><p>${c.text.slice(0, 115).replace(/\s+/g, " ")}…</p></button>`).join("")}</div><div class="section-title"><h2>Cenas conquistadas</h2><small>toque para ampliar</small></div><div class="scene-strip">${books.slice(0, 4).map((c) => `<button class="scene-thumb" data-chapter="${c.number}" style="background-image:linear-gradient(0deg,rgba(7,5,16,.9),transparent 72%),url('scenes/chapters/chapter-${c.number}.webp')"><b>${c.title}</b></button>`).join("")}</div>`;
+  }
+  renderStoryLibrary();
+  fetch("chapters.json")
+    .then((response) => response.json())
+    .then((book) => {
+      importedChapters = book.chapters;
+      renderStoryLibrary();
+    })
+    .catch(() => toast("O livro não pôde ser carregado"));
+  q("#arcade").innerHTML =
+    `<header class="screen-head"><div class="eyebrow">Central de jogos</div><h1>Treine. Corra. Descubra.</h1><p class="lead">Ganhe pontos para desbloquear o códice.</p></header><div class="mode-list"><button class="game-mode" data-play="race"><span class="icon">🏎</span><span><h3>Fuga de Nerakar</h3><p>Desvie dos destroços sob a tempestade.</p></span><b>+XP</b></button><button class="game-mode" data-play="puzzle"><span class="icon">◈</span><span><h3>Sinapses</h3><p>Encontre os pares do universo.</p></span><b>+80</b></button><button class="game-mode" data-go="quiz"><span class="icon">✦</span><span><h3>Quiz da tempestade</h3><p>Teste o que aprendeu no capítulo 1.</p></span><b>+60</b></button><button class="game-mode" data-go="game"><span class="icon">ϟ</span><span><h3>Escolhas sob a chuva</h3><p>Uma rota narrativa alternativa.</p></span><b>Jogar</b></button></div><div id="gameStage"></div>`;
+  function renderCodex() {
+    q("#characters").innerHTML =
+      `<header class="screen-head"><div class="eyebrow">Conheça o universo</div><h1>Personagens • ${state.unlocked.length}/22</h1><p class="lead">Leia capítulos e jogue para liberar arquivos.</p></header><div class="codex-grid">${chars
+        .map((c) => {
+          const open =
+            state.unlocked.includes(c.id) || state.chapter >= c.unlock;
+          return `<button class="codex-card ${open ? "" : "locked"}" data-char="${c.id}" ${open ? "" : "disabled"}><img src="${c.img}" alt="${open ? "Retrato de " + c.name : "Personagem bloqueado"}"><div class="info"><h3>${open ? c.name : "Arquivo bloqueado"}</h3><small>${open ? c.role : "Disponível no nível " + c.unlock}</small></div></button>`;
+        })
+        .join("")}</div>`;
+  }
+  function showChar(id) {
+    const c = chars.find((x) => x.id === id);
+    if (!c) return;
+    q("#characterDetail").innerHTML =
+      `<button class="back" data-go="characters">← Voltar ao códice</button><img class="detail-hero" src="${c.img}" alt="Retrato de ${c.name}"><header class="screen-head"><div class="eyebrow">${c.role}</div><h1>${c.name}</h1><div class="detail-data"><span>${c.age}</span><span>${c.power}</span></div></header><article class="card lore"><h2>Arquivo</h2><p>${c.bio}</p><h2>Curiosidade desbloqueada</h2><p>${c.fact}</p></article>`;
+    const t = document.createElement("button");
+    t.dataset.go = "characterDetail";
+    document.body.append(t);
+    t.click();
+    t.remove();
+  }
+  q("#profile").innerHTML =
+    `<header class="screen-head"><div class="eyebrow">Identidade do jogador</div><h1>Login e perfil</h1></header><div class="profile-card"><div class="player-chip"><div class="avatar">C</div><div><strong id="profileName"></strong><small id="profileStats"></small></div></div><label class="field">Nome do jogador<input id="nameInput" maxlength="20" autocomplete="nickname"></label><button class="btn primary" id="saveProfile">Salvar perfil</button><p class="small">O perfil funciona offline e fica salvo somente neste aparelho.</p></div><div class="section-title"><h2>Conquistas</h2><small>arquivo pessoal</small></div><div><div class="achievement"><i>ϟ</i><div><b>Primeiro impacto</b><small> Abra o modo história</small></div></div><div class="achievement ${state.puzzle ? "" : "locked"}"><i>◈</i><div><b>Mente sincronizada</b><small> Complete o quebra-cabeça</small></div></div><div class="achievement ${state.bestRace >= 15 ? "" : "locked"}"><i>🏎</i><div><b>Fuga perfeita</b><small> Marque 15 pontos na corrida</small></div></div></div>`;
+  function profilePaint() {
+    q("#profileName").textContent = state.name;
+    q("#profileStats").textContent =
+      `Nível ${state.chapter} • ${state.points} pontos`;
+    q("#nameInput").value = state.name;
+  }
+  q("#saveProfile").addEventListener("click", () => {
+    const v = q("#nameInput").value.trim();
+    if (v) state.name = v;
+    persist();
+    profilePaint();
+    refreshHome();
+    toast("Perfil salvo");
+  });
+  function navigate(id) {
+    const button = document.createElement("button");
+    button.dataset.go = id;
+    document.body.append(button);
+    button.click();
+    button.remove();
+  }
+  function openChapter(n) {
+    const chapter = importedChapters.find((c) => c.number === n);
+    const parts = chapter?.pages || excerpts[n];
+    if (!parts) {
+      toast("Capítulo indisponível");
+      return;
+    }
+    let i = Math.min(load(`chapter_${n}_page`, 0), parts.length - 1);
+    const title =
+      chapter?.title || ch.find((c) => c.n === n)?.title || `Capítulo ${n}`;
+    const render = () => {
+      q("#chapterReader").innerHTML =
+        `<button class="back" data-go="story">← Capítulos</button><div class="reader-shell"><header class="screen-head"><div class="eyebrow">Capítulo ${n} • página ${i + 1}/${parts.length}</div><h1>${title}</h1></header>${i === 0 ? `<img class="chapter-cover" src="scenes/chapters/chapter-${n}.webp" alt="Ilustração do capítulo ${n}">` : ""}<article class="card chapter" style="font-size:${readerSize}px;white-space:pre-line">${parts[i]}</article><div class="book-panel"><label>Tamanho da letra</label><input id="upgradeFont" type="range" min="16" max="28" value="${readerSize}"></div><div class="reader-actions"><button class="btn alt" id="uPrev">←</button><button class="btn alt" id="uVoice">🔊 Voz</button><button class="btn primary" id="uNext">${i === parts.length - 1 ? "Concluir" : "Próxima →"}</button></div></div>`;
+      q("#upgradeFont").oninput = (e) => {
+        readerSize = +e.target.value;
+        save("readerSize", readerSize);
+        q("#chapterReader .chapter").style.fontSize = readerSize + "px";
+      };
+      q("#uPrev").onclick = () => {
+        i = Math.max(0, i - 1);
+        save(`chapter_${n}_page`, i);
+        render();
+      };
+      q("#uVoice").onclick = () => speak(parts[i]);
+      q("#uNext").onclick = () => {
+        if (i < parts.length - 1) {
+          i++;
+          save(`chapter_${n}_page`, i);
+          render();
+        } else {
+          state.scenes = Math.max(state.scenes, n * 4);
+          const unlocks = chars.filter((c) => c.unlock <= n).map((c) => c.id);
+          state.unlocked = [...new Set([...state.unlocked, ...unlocks])];
+          persist();
+          reward(50, `Capítulo ${n} concluído`);
+          renderCodex();
+          renderStoryLibrary();
+          navigate("story");
+        }
+      };
+    };
+    navigate("chapterReader");
+    render();
+  }
+  let speech = null;
+  function speak(text) {
+    if (!("speechSynthesis" in window)) {
+      toast("Voz indisponível neste celular");
+      return;
+    }
+    speechSynthesis.cancel();
+    speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "pt-BR";
+    speech.rate = 0.92;
+    speechSynthesis.speak(speech);
+    toast("Narração iniciada");
+  }
+  function race() {
+    q("#gameStage").innerHTML =
+      `<div class="section-title"><h2>Fuga de Nerakar</h2><small>toque nas setas</small></div><div class="race"><div class="race-hud"><span id="raceScore">0</span><span id="raceTime">30s</span></div><div class="road"></div><div class="car"></div></div><div class="race-controls"><button id="left">←</button><button id="right">→</button></div>`;
+    let lane = 1,
+      score = 0,
+      time = 30,
+      run = true;
+    const car = q(".car"),
+      area = q(".race");
+    const move = (d) => {
+      lane = Math.max(0, Math.min(2, lane + d));
+      car.style.left = `calc(${30 + lane * 20}% - 22px)`;
+    };
+    q("#left").onclick = () => move(-1);
+    q("#right").onclick = () => move(1);
+    const spawn = setInterval(() => {
+      if (!run) return;
+      const o = document.createElement("div");
+      o.className = "obstacle";
+      const ol = Math.floor(Math.random() * 3);
+      o.style.left = `calc(${30 + ol * 20}% - 21px)`;
+      area.append(o);
+      let y = -70;
+      const fall = setInterval(() => {
+        y += 8;
+        o.style.top = y + "px";
+        if (
+          y > area.clientHeight - 115 &&
+          y < area.clientHeight - 25 &&
+          ol === lane
+        ) {
+          run = false;
+          clearInterval(fall);
+          o.remove();
+          finish();
+        } else if (y > area.clientHeight) {
+          clearInterval(fall);
+          o.remove();
+          score++;
+          q("#raceScore").textContent = score;
+        }
+      }, 45);
+    }, 720);
+    const timer = setInterval(() => {
+      time--;
+      q("#raceTime").textContent = time + "s";
+      if (time <= 0) {
+        run = false;
+        finish();
+      }
+    }, 1000);
+    function finish() {
+      if (!q(".race")) return;
+      clearInterval(spawn);
+      clearInterval(timer);
+      state.bestRace = Math.max(state.bestRace, score);
+      persist();
+      reward(Math.min(100, score * 5), "Corrida concluída");
+      q("#gameStage").insertAdjacentHTML(
+        "beforeend",
+        `<div class="card"><h2>Fim da corrida</h2><p>${score} destroços superados.</p><button class="btn primary" data-play="race">Jogar novamente</button></div>`,
+      );
+    }
+  }
+  function puzzle() {
+    const icons = ["ϟ", "◈", "⚙", "☄", "ϟ", "◈", "⚙", "☄"].sort(
+      () => Math.random() - 0.5,
+    );
+    q("#gameStage").innerHTML =
+      `<div class="section-title"><h2>Sinapses</h2><small>encontre os pares</small></div><div class="puzzle-board">${icons.map((x, i) => `<button class="puzzle-card" data-i="${i}" data-v="${x}">${x}</button>`).join("")}</div><p class="small">Cada par restaura uma parte do arquivo de Nerakar.</p>`;
+    let open = [],
+      done = 0;
+    qa(".puzzle-card").forEach(
+      (c) =>
+        (c.onclick = () => {
+          if (c.classList.contains("open") || open.length === 2) return;
+          c.classList.add("open");
+          open.push(c);
+          if (open.length === 2)
+            setTimeout(() => {
+              if (open[0].dataset.v === open[1].dataset.v) {
+                open.forEach((x) => x.classList.add("done"));
+                done += 2;
+                if (done === 8) {
+                  state.puzzle = true;
+                  persist();
+                  reward(80, "Sinapses restauradas");
+                }
+              } else open.forEach((x) => x.classList.remove("open"));
+              open = [];
+            }, 500);
+        }),
+    );
+  }
+  document.addEventListener("click", (e) => {
+    const chapterButton = e.target.closest("[data-chapter]");
+    if (chapterButton) {
+      openChapter(+chapterButton.dataset.chapter);
+      return;
+    }
+    const c = e.target.closest("[data-char]");
+    if (c) {
+      showChar(c.dataset.char);
+      return;
+    }
+    const p = e.target.closest("[data-play]");
+    if (p) {
+      p.dataset.play === "race" ? race() : puzzle();
+      q("#gameStage").scrollIntoView({ behavior: "smooth" });
+    }
+    const s = e.target.closest("[data-scene]");
+    if (s) {
+      toast("Cena ampliada • legenda liberada");
+      s.classList.toggle("expanded");
+    }
+  });
+  const observer = new MutationObserver(() => {
+    const visible = qa(".page:not(.hidden)")[0];
+    if (!visible) return;
+    if (visible.id === "characters") renderCodex();
+    if (visible.id === "profile") profilePaint();
+    if (visible.id === "story") {
+      state.scenes = Math.max(state.scenes, 1);
+      persist();
+    }
+  });
+  observer.observe(q("main"), {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+  renderCodex();
+  profilePaint();
+  refreshHome();
 })();
