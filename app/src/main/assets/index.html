@@ -13,6 +13,7 @@
 .scene-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:16px 0}.scene-panels figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid #644187;background:#150f28}.scene-panels svg{display:block;width:100%;height:auto}.scene-panels figcaption{padding:9px 12px;color:#ddc9f4;font-size:.82rem}.chapter{overflow-wrap:break-word}.chapter-nav{display:flex;flex-wrap:wrap;align-items:center;gap:7px}.chapter-nav .btn{margin:0}.chapter-nav .btn:disabled{opacity:.35}
 .music-control{position:fixed;z-index:9;right:12px;top:max(12px,env(safe-area-inset-top));border:1px solid #9266ca;border-radius:999px;background:#130e25e8;color:#fff;padding:9px 13px;box-shadow:0 8px 24px #0008;backdrop-filter:blur(10px);font-size:.82rem;font-weight:800}.music-control.playing{background:#563087;border-color:#c19cff}.music-control:focus-visible{outline:3px solid var(--b)}
 </style>
+<link rel="stylesheet" href="upgrade.css">
 </head>
 <body>
 <audio id="soundtrack" loop preload="auto" src="audio/nerakar-tempestade.wav"></audio>
@@ -310,14 +311,19 @@
 <button class="btn primary hidden" id="quizNext">Próxima →</button>
 </article>
 </section>
-<footer>Sinapse Final • capítulo 1 integral • leitura e fonte salvas neste navegador • jogo alternativo separado do texto oficial.</footer>
+<section id="story" class="page hidden"></section>
+<section id="arcade" class="page hidden"></section>
+<section id="profile" class="page hidden"></section>
+<section id="chapterReader" class="page hidden"></section>
+<section id="characterDetail" class="page hidden"></section>
+<footer>Sinapse Final • experiência offline • progresso salvo neste aparelho.</footer>
 </main>
 <nav aria-label="Navegação principal">
 <button data-go="home" aria-current="page">⌂ Início</button>
-<button data-go="read">▤ Ler</button>
-<button data-go="game">ϟ Jogar</button>
-<button data-go="characters">♟ Elenco</button>
-<button data-go="quiz">✦ Quiz</button>
+<button data-go="story">▤ História</button>
+<button data-go="arcade">ϟ Jogar</button>
+<button data-go="characters">♟ Códice</button>
+<button data-go="profile">● Perfil</button>
 </nav>
 <script>
 (()=>{'use strict';
@@ -351,5 +357,6 @@ $('quizNext').addEventListener('click',()=>{if(qi===quiz.length){qi=0;score=0}el
 renderRead();renderScene();renderQuiz();go(location.hash.slice(1)||'home',{history:false});
 })();
 </script>
+<script src="upgrade.js"></script>
 </body>
 </html>

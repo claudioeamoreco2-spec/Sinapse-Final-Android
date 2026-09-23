@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebSettings;
+import android.graphics.Color;
 
 /** Leitor offline do primeiro capítulo de Sinapse Final. */
 public class MainActivity extends Activity {
@@ -13,8 +15,13 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         webView = new WebView(this);
         webView.setWebViewClient(new WebViewClient());
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDomStorageEnabled(true);
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setAllowFileAccess(true);
+        settings.setMediaPlaybackRequiresUserGesture(true);
+        settings.setDefaultTextEncodingName("UTF-8");
+        webView.setBackgroundColor(Color.rgb(7, 6, 17));
         setContentView(webView);
         webView.loadUrl("file:///android_asset/index.html");
     }
