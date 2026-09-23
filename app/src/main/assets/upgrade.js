@@ -433,8 +433,20 @@
     const title =
       chapter?.title || ch.find((c) => c.n === n)?.title || `Capítulo ${n}`;
     const render = () => {
+      const sceneImage =
+        n === 1 && i >= 9
+          ? "scenes/mercenarios-rua-anime.png"
+          : n === 1 && i >= 5
+            ? "scenes/home-caleb-kaelum.png"
+            : `scenes/chapters/chapter-${n}.webp`;
+      const sceneCaption =
+        n === 1 && i >= 9
+          ? "O cerco nas ruas de Nerakar"
+          : n === 1 && i >= 5
+            ? "A energia kriptante desperta"
+            : `Cena do capítulo ${n}`;
       q("#chapterReader").innerHTML =
-        `<button class="back" data-go="story">← Capítulos</button><div class="reader-shell"><header class="screen-head"><div class="eyebrow">Capítulo ${n} • página ${i + 1}/${parts.length}</div><h1>${title}</h1></header>${i === 0 ? `<img class="chapter-cover" src="scenes/chapters/chapter-${n}.webp" alt="Ilustração do capítulo ${n}">` : ""}<article class="card chapter" style="font-size:${readerSize}px;white-space:pre-line">${parts[i]}</article><div class="book-panel"><label>Tamanho da letra</label><input id="upgradeFont" type="range" min="16" max="28" value="${readerSize}"></div><div class="reader-actions"><button class="btn alt" id="uPrev">←</button><button class="btn alt" id="uVoice">🔊 Voz</button><button class="btn primary" id="uNext">${i === parts.length - 1 ? "Concluir" : "Próxima →"}</button></div></div>`;
+        `<button class="back" data-go="story">← Capítulos</button><div class="reader-shell"><header class="screen-head"><div class="eyebrow">Capítulo ${n} • página ${i + 1}/${parts.length}</div><h1>${title}</h1></header><figure class="reader-scene"><img class="chapter-cover" src="${sceneImage}" alt="Cena do capítulo ${n}"><figcaption>${sceneCaption}</figcaption></figure><article class="card chapter" style="font-size:${readerSize}px;white-space:pre-line">${parts[i]}</article><div class="book-panel"><label>Tamanho da letra</label><input id="upgradeFont" type="range" min="16" max="28" value="${readerSize}"></div><div class="reader-actions"><button class="btn alt" id="uPrev">←</button><button class="btn alt" id="uVoice">🔊 Voz</button><button class="btn primary" id="uNext">${i === parts.length - 1 ? "Concluir" : "Próxima →"}</button></div></div>`;
       q("#upgradeFont").oninput = (e) => {
         readerSize = +e.target.value;
         save("readerSize", readerSize);
@@ -445,7 +457,7 @@
         save(`chapter_${n}_page`, i);
         render();
       };
-      q("#uVoice").onclick = () => speak(parts[i]);
+      q("#uVoice").onclick = () => speak(parts[i], q("#uVoice"));
       q("#uNext").onclick = () => {
         if (i < parts.length - 1) {
           i++;
@@ -467,7 +479,32 @@
     render();
   }
   let speech = null;
-  function speak(text) {
+  function speak(text, button) {
+    if (speech && button?.dataset.reading === "true") {
+      if (window.AndroidVoice) window.AndroidVoice.stop();
+      else speechSynthesis.cancel();
+      speech = null;
+      button.dataset.reading = "false";
+      button.textContent = "🔊 Voz";
+      return;
+    }
+    if (window.AndroidVoice) {
+      speech = { native: true };
+      window.AndroidVoice.speak(text);
+      button.dataset.reading = "true";
+      button.textContent = "■ Parar";
+      window.onAndroidVoiceState = (state) => {
+        if (state === "done" || state === "error") {
+          speech = null;
+          if (button) {
+            button.dataset.reading = "false";
+            button.textContent = state === "error" ? "🔊 Tentar" : "🔊 Voz";
+          }
+        }
+      };
+      toast("Narração iniciada");
+      return;
+    }
     if (!("speechSynthesis" in window)) {
       toast("Voz indisponível neste celular");
       return;
@@ -476,7 +513,17 @@
     speech = new SpeechSynthesisUtterance(text);
     speech.lang = "pt-BR";
     speech.rate = 0.92;
+    speech.onend = () => {
+      if (button) {
+        button.dataset.reading = "false";
+        button.textContent = "🔊 Voz";
+      }
+    };
     speechSynthesis.speak(speech);
+    if (button) {
+      button.dataset.reading = "true";
+      button.textContent = "■ Parar";
+    }
     toast("Narração iniciada");
   }
   function race() {

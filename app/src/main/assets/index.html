@@ -156,31 +156,8 @@
 <div class="eyebrow">Biblioteca • capítulo 1</div>
 <h1>O Brilho da Tempestade</h1>
 <div class="chapter-art">
-<svg class="art" viewBox="0 0 800 350" role="img" aria-label="Cidade de Nerakar sob relâmpagos roxos" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="sky" x2="0" y2="1">
-<stop stop-color="#090c22"/>
-<stop offset="1" stop-color="#4b2873"/>
-</linearGradient>
-<linearGradient id="lit" x2="0" y2="1">
-<stop stop-color="#c7a5ff"/>
-<stop offset="1" stop-color="#6c38ad"/>
-</linearGradient>
-</defs>
-<rect width="800" height="350" fill="url(#sky)"/>
-<circle cx="635" cy="85" r="59" fill="#a26bda" opacity=".16"/>
-<path d="M380 0 345 72 392 91 315 210 350 114 302 91 331 0M615 0 588 53 622 70 567 151 584 79 554 62 580 0" fill="url(#lit)" stroke="#f1e1ff" stroke-width="2"/>
-<g fill="#110f23">
-<path d="M0 235h38v-78h49v43h26v-94h55v96h42v-49h46v-88h77v135h38v-55h52v85h40v-125h61v112h32v-72h48v90h44v-125h57v90h38v-61h41v190H0z"/>
-</g>
-<g fill="#bd8ff9" opacity=".57">
-<path d="M120 125h7v11h-7zm20 0h7v11h-7zm130-40h7v11h-7zm25 20h7v11h-7zm100 62h7v11h-7zm94-36h7v11h-7zm110 0h7v11h-7zm80 58h7v11h-7z"/>
-</g>
-<path d="M0 328q170-40 360 0t440-11v33H0" fill="#050611"/>
-<g stroke="#c29ce8" stroke-opacity=".4">
-<path d="M10 0 90 350M120 0l80 350M300 0l80 350M500 0l80 350M680 0l80 350"/>
-</g>
-</svg>
+<img class="art chapter-scene-image" id="readSceneImage" src="scenes/chapters/chapter-1.webp" alt="Cena ilustrada do capítulo 1">
+<div class="scene-caption" id="readSceneCaption">O confronto no colégio</div>
 </div>
 <div class="book-panel">
 <label for="fontSize">Tamanho da letra</label>
@@ -344,10 +321,11 @@ const pages=["Chovia com fúria sobre a metrópole. Mas não era uma tempestade 
 $('fontSize').addEventListener('input',e=>{$('readText').style.fontSize=e.target.value+'px';store.set('sf_font',e.target.value)});$('fontSize').value=store.get('sf_font')||'19';$('readText').style.fontSize=$('fontSize').value+'px';
 let page=Math.min(Math.max(Number(store.get('sf_page'))||0,0),pages.length-1);
 let isReading=false;
-function stopReading(){if('speechSynthesis' in window)window.speechSynthesis.cancel();isReading=false;$('readAloud').textContent='🔊 Ler em voz alta';$('voiceStatus').textContent='Narração pelo navegador';if(musicWasPlayingBeforeVoice){soundtrack.play().catch(()=>{});musicWasPlayingBeforeVoice=false}}
-function startReading(){if(!('speechSynthesis' in window)){$('voiceStatus').textContent='A narração não está disponível neste aparelho';return}const utterance=new SpeechSynthesisUtterance(pages[page]);utterance.lang='pt-BR';utterance.rate=.92;utterance.pitch=1;utterance.onend=stopReading;utterance.onerror=()=>{$('voiceStatus').textContent='Não foi possível iniciar a narração';isReading=false;$('readAloud').textContent='🔊 Tentar novamente'};window.speechSynthesis.cancel();musicWasPlayingBeforeVoice=!soundtrack.paused;if(musicWasPlayingBeforeVoice)soundtrack.pause();window.speechSynthesis.speak(utterance);isReading=true;$('readAloud').textContent='■ Parar leitura';$('voiceStatus').textContent=`Lendo página ${page+1}`}
+function stopReading(){if(window.AndroidVoice)window.AndroidVoice.stop();else if('speechSynthesis' in window)window.speechSynthesis.cancel();isReading=false;$('readAloud').textContent='🔊 Ler em voz alta';$('voiceStatus').textContent='Voz em português do Android';if(musicWasPlayingBeforeVoice){soundtrack.play().catch(()=>{});musicWasPlayingBeforeVoice=false}}
+window.onAndroidVoiceState=state=>{if(state==='reading'){$('voiceStatus').textContent=`Lendo página ${page+1}`;return}if(state==='error'){$('voiceStatus').textContent='Não foi possível iniciar a voz';isReading=false;$('readAloud').textContent='🔊 Tentar novamente';return}isReading=false;$('readAloud').textContent='🔊 Ler em voz alta';$('voiceStatus').textContent='Leitura concluída'};
+function startReading(){musicWasPlayingBeforeVoice=!soundtrack.paused;if(musicWasPlayingBeforeVoice)soundtrack.pause();if(window.AndroidVoice){window.AndroidVoice.speak(pages[page]);isReading=true;$('readAloud').textContent='■ Parar leitura';$('voiceStatus').textContent='Preparando narração…';return}if(!('speechSynthesis' in window)){$('voiceStatus').textContent='A narração não está disponível neste aparelho';return}const utterance=new SpeechSynthesisUtterance(pages[page]);utterance.lang='pt-BR';utterance.rate=.92;utterance.onend=stopReading;utterance.onerror=()=>window.onAndroidVoiceState('error');window.speechSynthesis.cancel();window.speechSynthesis.speak(utterance);isReading=true;$('readAloud').textContent='■ Parar leitura';$('voiceStatus').textContent=`Lendo página ${page+1}`}
 $('readAloud').addEventListener('click',()=>isReading?stopReading():startReading());
-function renderRead(){$('readText').textContent=pages[page];$('readCount').textContent=`Página ${page+1} de ${pages.length}`;$('readMeter').style.width=`${100*(page+1)/pages.length}%`;$('readNext').textContent=page===pages.length-1?'Voltar ao início ↺':'Próxima página →';$('readPrev').disabled=page===0}
+function renderRead(){const scene=page<5?['scenes/chapters/chapter-1.webp','O confronto no colégio']:page<9?['scenes/home-caleb-kaelum.png','A fúria da tempestade desperta']:['scenes/mercenarios-rua-anime.png','O cerco dos mercenários nas ruas'];$('readSceneImage').src=scene[0];$('readSceneCaption').textContent=scene[1];$('readText').textContent=pages[page];$('readCount').textContent=`Página ${page+1} de ${pages.length}`;$('readMeter').style.width=`${100*(page+1)/pages.length}%`;$('readNext').textContent=page===pages.length-1?'Voltar ao início ↺':'Próxima página →';$('readPrev').disabled=page===0}
 $('readPrev').addEventListener('click',()=>{stopReading();page=Math.max(0,page-1);store.set('sf_page',page);renderRead()});$('readNext').addEventListener('click',()=>{stopReading();page=(page+1)%pages.length;store.set('sf_page',page);renderRead()});$('readRestart').addEventListener('click',()=>{stopReading();page=0;store.set('sf_page',page);renderRead()});
 const scenes={start:{text:'A chuva invade a sala de aula. Oliver está diante de Caleb. O estrondo de um relâmpago abafa qualquer palavra. Qual é sua primeira atitude?',choices:[['Tentar conversar com Oliver','talk'],['Observar a saída e os perigos','observe']]},talk:{text:'Caleb tenta encontrar no rosto de Oliver um sinal do amigo que conheceu. Por um segundo, a tensão dá lugar ao silêncio. O que você pergunta?',choices:[['“O que aconteceu com a nossa amizade?”','memory'],['“Por que você me trouxe até aqui?”','motive']]},observe:{text:'Você percebe vidro espalhado perto da porta e uma janela golpeada pelo vento. Oliver acompanha seus movimentos, desconfiado. O que faz?',choices:[['Voltar a atenção para Oliver','talk'],['Ficar perto da parede, longe dos cacos','safe']]},memory:{text:'“Você ainda se lembra de quem éramos?”, Caleb pergunta. Um trovão interrompe a resposta. Por enquanto, nenhum dos dois baixa a guarda. Fim desta rota alternativa.',choices:[['Jogar novamente','start']]},motive:{text:'Oliver demora a responder. A tempestade parece se aproximar, e Caleb percebe que algumas respostas custam mais do que uma luta. Fim desta rota alternativa.',choices:[['Jogar novamente','start']]},safe:{text:'Caleb se afasta dos cacos. A segurança dura pouco: Oliver dá um passo à frente e o confronto de palavras recomeça. Fim desta rota alternativa.',choices:[['Jogar novamente','start']]}};
 let scene='start';function renderScene(){const s=scenes[scene];$('sceneText').textContent=s.text;$('sceneChoices').replaceChildren();s.choices.forEach(([label,next])=>{const b=document.createElement('button');b.className='btn';b.textContent=label;b.addEventListener('click',()=>{scene=next;renderScene()});$('sceneChoices').append(b)})}

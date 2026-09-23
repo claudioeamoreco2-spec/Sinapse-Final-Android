@@ -505,6 +505,34 @@ body {
   border: 1px solid #7450a0;
   margin: 6px 0 14px;
 }
+.reader-scene {
+  margin: 6px 0 14px;
+  position: relative;
+}
+.reader-scene .chapter-cover {
+  margin: 0;
+}
+.reader-scene figcaption,
+.scene-caption {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(7, 5, 16, 0.82);
+  color: #fff;
+  font-size: 0.78rem;
+  backdrop-filter: blur(8px);
+}
+.chapter-art {
+  position: relative;
+}
+.chapter-scene-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
 .reader-shell .chapter {
   font-size: var(--reader-size, 19px);
 }
