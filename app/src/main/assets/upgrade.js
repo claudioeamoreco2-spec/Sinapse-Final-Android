@@ -28,6 +28,8 @@ const chars=[
 {id:'giro',name:'Giro',role:'Divindade',img:'characters/kaelum.svg',unlock:8,power:'Desconhecido',age:'Eterno',bio:'Presença divina ainda envolta em mistério.',fact:'Sua influência será revelada em capítulos futuros.'},
 {id:'thar',name:'Thar',role:'Olho do Julgamento',img:'characters/kaelum.svg',unlock:4,power:'Verdade absoluta',age:'Eterno',bio:'Divindade esquecida venerada por Tharzul. Não exige preces, apenas verdades.',fact:'Sua essência alimenta o Anel de Tharzul.'}
 ];
+// Cada integrante possui um retrato exclusivo recortado do atlas oficial do elenco.
+chars.forEach(character=>{character.img=`characters/v2/${character.id}.webp`});
 const ch=[
 {n:1,title:'O Brilho da Tempestade',sub:'Caleb contra Oliver em uma Nerakar destruída.',open:true},
 {n:2,title:'O Olho da Tempestade',sub:'Um ano antes: o raio escolhe Caleb e o mundo muda.',open:true},
