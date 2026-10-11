@@ -1,0 +1,315 @@
+{
+  "repository": "https://github.com/claudioeamoreco2-spec/Sinapse-Final-Android",
+  "commit": "c440b7a2fcbf26dfe87179ac30a7f4c25c3967da",
+  "files": [
+    {
+      "path": ".github/workflows/build-android.yml",
+      "sha": "39cb5896a794fab92b1fbd9f36ca997c5edc4bfe",
+      "size": 867
+    },
+    {
+      "path": "README.md",
+      "sha": "cdd3ad8ee5ddf313e2905a042782a67c6bb5e30e",
+      "size": 96
+    },
+    {
+      "path": "app/build.gradle",
+      "sha": "d0517ee3340d818e418ca1a4bce592cb63fd4de1",
+      "size": 401
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha": "4b73d41ac357570588b2274646acb4066cd0d094",
+      "size": 923
+    },
+    {
+      "path": "app/src/main/assets/chapters.json",
+      "sha": "c86c781e1689e83e2093bb6866cfaf02b6b560be",
+      "size": 300003
+    },
+    {
+      "path": "app/src/main/assets/characters/caleb.svg",
+      "sha": "393ae5e3e00566dce05f951d4461af5b1a9c163f",
+      "size": 1526
+    },
+    {
+      "path": "app/src/main/assets/characters/eron.svg",
+      "sha": "58b2158a19b38555508344942f0eff9569fbfd07",
+      "size": 1370
+    },
+    {
+      "path": "app/src/main/assets/characters/kaelum.svg",
+      "sha": "6af1bd3ce8671a8ec1750dcb34dbdd2b3d0fa0c2",
+      "size": 1443
+    },
+    {
+      "path": "app/src/main/assets/characters/oliver.svg",
+      "sha": "60cdb3a36c2bbacfcc44de1aac8ced1feb5d974e",
+      "size": 1300
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/axel.webp",
+      "sha": "536891b7a3b70367c2069d1e580ae7861fef27d8",
+      "size": 36150
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/baltazar.webp",
+      "sha": "e70a8033309618d6c70ad7fc3d66a4c4a7fd1f3b",
+      "size": 35122
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/caleb.webp",
+      "sha": "259acac5f4c84c07f213d38d200d2c373a27edd1",
+      "size": 36492
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/cibele.webp",
+      "sha": "d4091ee0da133ddbe32f5b433a295c8d31434069",
+      "size": 31836
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/eko.webp",
+      "sha": "89bb15800366a252eebb891fce9b164d588888e6",
+      "size": 33090
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/eron.webp",
+      "sha": "30f324f9d7636b75b6815036f1a75b4aa512d3ff",
+      "size": 27172
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/giro.webp",
+      "sha": "e97c8f3b8c6fb7d117a985bd189bda9e983a13a8",
+      "size": 39850
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/harkan.webp",
+      "sha": "f57f666f68ff16e9ca5e4552d0a3c89c5f53749c",
+      "size": 38412
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/kael.webp",
+      "sha": "d095c5c95c9b9ee3251e52350fa428c85bc2ba35",
+      "size": 33734
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/kaelum.webp",
+      "sha": "a2f60f38b457760d5f724f728439a43209a1e304",
+      "size": 41660
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/kaien.webp",
+      "sha": "21d3ca8b7b09dfc930741eadfe10c7284c07bf64",
+      "size": 41632
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/lazhar.webp",
+      "sha": "23921578c90da173228d470444a1b32df59db7d4",
+      "size": 31446
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/lira.webp",
+      "sha": "bf237a415e6869e66610b698b4cbf222228ff00f",
+      "size": 32704
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/lisandra.webp",
+      "sha": "43fd13122cd8d27b2b33192e22c2f383851322ad",
+      "size": 33702
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/mirael.webp",
+      "sha": "4ce3f6f50a893b9e8c1096a8732ab38938a5049f",
+      "size": 29874
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/miro.webp",
+      "sha": "b1883ef6fb772dbec09bd00c5efe1affac9d936c",
+      "size": 28266
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/nids.webp",
+      "sha": "2bd92f2828106ce44b6adf25b05917dc69d9db15",
+      "size": 42692
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/oliver.webp",
+      "sha": "345eef9f1c89610d7e6afaa58d3707476c67064d",
+      "size": 23916
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/sael.webp",
+      "sha": "d5b9f044d2ab0b7ff7ff3d6fad33802ff65b6ef7",
+      "size": 30224
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/thar.webp",
+      "sha": "a16e79b0be6931047629db9e2a6642d4e16288fb",
+      "size": 35872
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/tharn.webp",
+      "sha": "3de85f6cb7f56c821a4f745e71719454f6936c59",
+      "size": 31476
+    },
+    {
+      "path": "app/src/main/assets/characters/v2/tharzul.webp",
+      "sha": "26b5bc33048c5d3445f9f42c53030399f5ecbd77",
+      "size": 46202
+    },
+    {
+      "path": "app/src/main/assets/index.html",
+      "sha": "c3f4d3650bb2e49e24259e81d1fc7851026fd53f",
+      "size": 33763
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-1.webp",
+      "sha": "1c07e8f1cbd6708251a2f69179a473639bf75cca",
+      "size": 18240
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-10.webp",
+      "sha": "1c07e8f1cbd6708251a2f69179a473639bf75cca",
+      "size": 18240
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-11.webp",
+      "sha": "9e39e1121989aed86bdad1a306f31aca0627fd2f",
+      "size": 16794
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-12.webp",
+      "sha": "2201f7ca498e1a93616340f28fa6a9474e8125cf",
+      "size": 17660
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-2.webp",
+      "sha": "429d5bfaa9f3c4120e7e3a1dcdd1d76b272c9e03",
+      "size": 20214
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-3.webp",
+      "sha": "2d5ffd807091ba35261152bdb29554ac183158ef",
+      "size": 16974
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-4.webp",
+      "sha": "a2431d6645f96e59623073fd8089e3e36ced4c1c",
+      "size": 22308
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-5.webp",
+      "sha": "2d5ffd807091ba35261152bdb29554ac183158ef",
+      "size": 16974
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-6.webp",
+      "sha": "429d5bfaa9f3c4120e7e3a1dcdd1d76b272c9e03",
+      "size": 20214
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-7.webp",
+      "sha": "e9c1cce8e04512da931062b7c1f0302eb2dcc46f",
+      "size": 13732
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-8.webp",
+      "sha": "ed65d2bbffcf922849ab0bda11a38f983332de16",
+      "size": 15558
+    },
+    {
+      "path": "app/src/main/assets/scenes/chapters/chapter-9.webp",
+      "sha": "ed65d2bbffcf922849ab0bda11a38f983332de16",
+      "size": 15558
+    },
+    {
+      "path": "app/src/main/assets/scenes/home-caleb-kaelum.png",
+      "sha": "b57537211f5d2b1d4b1d4832bd98d6de57880331",
+      "size": 348732
+    },
+    {
+      "path": "app/src/main/assets/upgrade.css",
+      "sha": "ddcb9a3883af1fb046e49293a4a3eeec3eae1723",
+      "size": 12137
+    },
+    {
+      "path": "app/src/main/assets/upgrade.js",
+      "sha": "6b8becf899a89bcd314d0a6179d4640e295ad64e",
+      "size": 28881
+    },
+    {
+      "path": "app/src/main/java/com/sinapsefinal/leitor/MainActivity.java",
+      "sha": "fafff39bbb41bc2e60894fbffc9d7ddfd6a3970b",
+      "size": 3355
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher.xml",
+      "sha": "9a9a2eecf3d85d4481df6c2da599eddcd591d22e",
+      "size": 731
+    },
+    {
+      "path": "app/src/main/res/values/styles.xml",
+      "sha": "da6e3b4b4b2402eaef08de789401011d7632a21c",
+      "size": 509
+    },
+    {
+      "path": "build.gradle",
+      "sha": "e5ce0d95c7f5f20385cd3f1bbfe77db777662d94",
+      "size": 69
+    },
+    {
+      "path": "gradle.properties",
+      "sha": "3c5e11311bd5f328c2ef0eef1cf06eda2eaf7eae",
+      "size": 76
+    },
+    {
+      "path": "scripts/generate_soundtrack.py",
+      "sha": "640b3a8e6b1baa4c0948db9f5896cd02f5a9e39c",
+      "size": 935
+    },
+    {
+      "path": "scripts/import_book_pdf.py",
+      "sha": "256b26b92d86162373d355b91dd4e9966ceb14df",
+      "size": 2298
+    },
+    {
+      "path": "settings.gradle",
+      "sha": "7dc119adc783d196d30112bc57dba6f95df78ac1",
+      "size": 273
+    }
+  ],
+  "backup_sha256": "4f49448cedfd611c42926b0d426adef4f8fed3a7a818f7cdfdcf7831fbd59607",
+  "chapters_available": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "inaccessible_files": [
+    "sandbox:/mnt/data/Ecos_de_Nerakar_Expansao_Com_Novos_Capitulos.zip",
+    "sandbox:/mnt/data/Sinapse_Final_Codigo_Fonte_Codex.zip",
+    "sandbox:/mnt/data/REQUISITOS_EXPANSAO_ECOS_DE_NERAKAR.md"
+  ],
+  "chapter_object_sha256": {
+    "1": "3b5d0de7503d5e29c95ae63a7336375e413d2cc0fb47b7b11ccd68be9a6f706a",
+    "2": "032c4829135ac35045750133f218e1ceebfc1698ccd45b111a63c53a597b0643",
+    "3": "5c17155b947dab54f0fe9c3bdfd10600eeba01b306451227d68273247ae1800a",
+    "4": "916bf88bada495c2536acbce4d76df43070730da9f8169cfcd6f217d6a739a09",
+    "5": "a9ba920256c98b3ef19bff1f19cd3e89fb2c2eae766443efafc86efe91dc6265",
+    "6": "e5646734055f3f39960d9371129063db3382ec691f0bd2d7a692b0ff74d423ba",
+    "7": "6e22657ea238d2d9e1eb85ff90560d61b9967288b48157fd2fe2c9e112f7a489",
+    "8": "e1eed4e9a076e9e1b12ecb6ba6d77b87fd6eeb2f2f1120c824cf2f1a2a3f92c9",
+    "9": "419b1f5ce401308b5cbeb3c33b27efe1304f8e913b20075b449635514e7423ae",
+    "10": "97c5a142c3c44e3696d4e7fba45288abed07551e50e3f26d13990944417a19ab",
+    "11": "007c2f4ef0b0ec7ad7b68d1421bd31165984181ad28de590ce99f39fd3c92f25",
+    "12": "7081bc5fb36889470c44a31614c6b4c828817979b83fa69fbfbdea333cbed53e"
+  }
+}

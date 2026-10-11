@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Lagarto de Pedra</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#767c80" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#767c80"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#767c80" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#687581" d="M78 113Q19 130 21 96q-1-12 14-20-8 18 4 19l33-4 36-11 32 12 7 23-22 12-45-1Z"/>
+<path fill="#9ca9ae" d="m63 113-11 24-18 3 2 8 28-3 16-24m37-4 18 17 21 3 2 9-26-1-26-24"/>
+<path fill="#819198" d="m76 89 8-27 17 12 17-11 13 19 23 9 14 25-22 13-41-11-33 0Z"/>
+<path fill="#c3cbca" d="m129 88 23 6 16 22-20 11-23-15Z"/>
+<path fill="#d6ac58" d="m143 99 12 1-7 7-5-2Z"/>
+<path fill="#44575e" d="m157 114 11 2-11 6"/>
+<path fill="#6b8a88" d="m43 95 15-7 12 13-11 16-20-7m38-22 12-13 15 12-4 22-20 5Zm26 20 3-21 17 5 6 15-9 13Z"/>
+<path fill="#a8d2c2" d="m85 84 9 4-3 10-9 4Z"/>
+<path fill="none" stroke="#465b63" stroke-width="3" d="m35 101 8 8m17-11 5 9m50-10 5 10"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#767c80" stroke-width="2" opacity=".7"/>
+</svg>

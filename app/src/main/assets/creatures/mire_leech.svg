@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Sanguessuga do Brejo</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#735572" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#735572"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#735572" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#513b59" d="M137 139Q98 157 58 143q-36-12-24-43 10-25 35-20 16 3 12 17-3 10-13 7-14-7-16 6-3 13 16 16 31 5 37-13l11-38 35 1 9 24-13 30Z"/>
+<path fill="#7b576e" d="M138 135q-33 21-74 8-23-8-19-24 10 18 40 14 20-4 25-23l9-19 21 11Z"/>
+<path fill="#825c73" d="m112 87-8-26 16-27 25-5 21 20-2 31-20 27Z"/>
+<ellipse fill="#b4818c" cx="138" cy="61" rx="26" ry="29"/>
+<ellipse fill="#3d2e47" cx="138" cy="61" rx="17" ry="21"/>
+<path fill="#e1c4b0" d="m128 43 3 12 5-15 5 14 7-10-1 13 8-3-7 10 7 8-11-1-2 12-6-10-9 10 1-13-10-2 10-7-8-6 11 1Z"/>
+<ellipse fill="#6e4264" cx="138" cy="62" rx="7" ry="9"/>
+<path fill="none" stroke="#a07382" stroke-width="3" d="m116 91 26 7m-31 4 28 10m-35 3 26 13m-37-4 19 17m-35-12 9 15m-28-18 1 14m-17-22-7 11m-2-25-11 3m13-20-7-7"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#735572" stroke-width="2" opacity=".7"/>
+</svg>

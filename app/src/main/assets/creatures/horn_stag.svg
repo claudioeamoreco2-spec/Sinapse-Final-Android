@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Cervo de Chifres</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#927449" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#927449"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#927449" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="none" stroke="#d8bd8a" stroke-width="6" d="m127 74-13-22-4-20m12 34-18-5-8-16m18 9 10-17m10 31 13-23 3-23m-12 41 19-9 6-17m-16 7-9-9"/>
+<path fill="#9a7248" d="m48 90 15 7h39l18-18 23 11-9 29-14 10-9 23h-11l2-33H77l-9 33H56l3-34-15-7Z"/>
+<path fill="#b98c54" d="m111 98 4-24 22-8 16 17-7 17-21 16Z"/>
+<path fill="#dfc69a" d="m141 85 16 12-10 16-18-4-1-10Z"/>
+<path fill="#765940" d="m125 70-17-14 21 2m11 12 18-17-7 23"/>
+<path fill="#3b3832" d="m148 96 10 1-6 8-6-4Z"/>
+<ellipse fill="#333a32" cx="136" cy="83" rx="4" ry="5"/>
+<path fill="#e4c495" d="m109 108-2 12-12-4-19 3-5-12m-22-8-9-3 5-7 12 7"/>
+<path fill="#554432" d="m58 144-2 9h13v-9m33-1-2 10h12l3-10"/>
+<circle fill="#f0dcb0" stroke="none" cx="67" cy="102" r="2.5"/><circle fill="#f0dcb0" stroke="none" cx="80" cy="98" r="2.5"/><circle fill="#f0dcb0" stroke="none" cx="91" cy="104" r="2.5"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#927449" stroke-width="2" opacity=".7"/>
+</svg>

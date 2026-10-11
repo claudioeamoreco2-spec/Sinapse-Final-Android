@@ -1,0 +1,12 @@
+.gradle/
+**/build/
+local.properties
+__pycache__/
+*.pyc
+qa-output/
+node_modules/
+app/src/main/assets/audio/*.wav
+*.apk
+*.aab
+*.tmp
+*.before-import-*.bak

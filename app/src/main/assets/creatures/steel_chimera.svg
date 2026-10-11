@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Quimera de Aço</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#687e8f" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#687e8f"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#687e8f" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#5d647a" d="m85 103-22-35-29-25 8 35-17 8 26 20-7 16 33-4m26-16 10-36 28-28-4 35 17 9-27 24 9 16-28-1Z"/>
+<path fill="#94a2b5" d="m46 58 26 28-7 16-15-12 8-7m76-29-17 32 3 16 16-14-10-6"/>
+<path fill="#536d7d" d="M61 118 53 141l15 12 11-17 26-2 13 19 14-3-9-29 12-22-23-10-39 9Z"/>
+<path fill="#94a6b0" d="m69 104 26-9 25 8 1 19-18 14-28-6Z"/>
+<path fill="#b9c5c8" d="m76 105 14 5-3 16-12-4m21-19 17 1 1 16-12 7-9-8Z"/>
+<path fill="#586777" d="m94 86 6-33 20-14 19 17-2 27-22 22Z"/>
+<path fill="#9dabb3" d="m105 54 12-17 18 10 14 20-10 23-28-8Z"/>
+<path fill="#c5cbd0" d="m131 65 22 6 2 14-21 10-17-13Z"/>
+<path fill="#465669" d="m113 43-8-18 19 10m12 9 8-22 5 31"/>
+<path fill="#f1bc5d" d="m122 57 13 2-6 7-6-1Z"/>
+<path fill="#314351" d="m150 75 7 6-8 4-5-4Z"/>
+<path fill="#f2e3be" d="m135 90 4 8 4-8m4-4 4 6 3-7"/>
+<path fill="#879eae" d="M63 116Q25 122 30 87q0-21 15-27l10 6-5 17-9 1q-3 19 22 17Z"/>
+<path fill="#a9bdc8" d="m41 65 0-21 15-9 15 9-4 15-15 11Z"/>
+<path fill="#edbc69" d="m52 46 10 0-4 5-5-1Z"/>
+<path fill="none" stroke="#546d7e" stroke-width="3" d="m76 143-12 3m64-2-13 3m-70-64-4-9m-7 17 10-3"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#687e8f" stroke-width="2" opacity=".7"/>
+</svg>

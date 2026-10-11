@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Fogo-fátuo do Brejo</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#4ba09a" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4ba09a"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#4ba09a" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#2b605f" opacity=".5" stroke="none" d="M33 103q-5-33 24-50 0-24 23-28l18 14q37-13 51 11 24 10 24 36 18 40-16 60l-38 10-32-9-24 9-7-23Z"/>
+<path fill="#3c8a84" d="M48 126q-16-38 14-51 4-25 26-26 10-29 26-27-8 25 11 37 27 7 29 35 10 35-19 45l-11 26-18-15-17 17-15-18-25 2 9-18Z"/>
+<path fill="#77c8b7" d="M62 119q-12-24 10-40 2-20 24-21 9-21 14-18 0 18 17 31 21 9 14 38l-15 25-18-4-13 16-15-14-15 5Z"/>
+<path fill="#b4e6ce" d="M77 103q-10-22 10-35 12 16 28 9 16 8 11 24l-17 17-20-2Z"/>
+<path fill="#275f5e" d="m80 88 13 3-5 11-7-5m22-6 17-5-5 14-11 2"/>
+<path fill="none" stroke="#ddf5d7" stroke-width="3" d="m66 60-6-10m90 2 5-8m-17 113 6 7"/>
+<circle fill="#c1eccb" stroke="none" cx="41" cy="74" r="4"/><circle fill="#9edac1" stroke="none" cx="156" cy="126" r="3"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#4ba09a" stroke-width="2" opacity=".7"/>
+</svg>

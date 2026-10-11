@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Sentinela das Ruínas</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#ab9974" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ab9974"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#ab9974" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#8d8471" d="m68 81 11-21 39-1 13 24-6 43H72Z"/>
+<path fill="#b9aa89" d="m75 62 7-34 30-1 13 34-16 20-20 0Z"/>
+<path fill="#716d62" d="m78 29 2-10 10 5 9-12 7 12 11-6-1 13"/>
+<path fill="#514f49" d="m83 49 31 0-4 13H87Z"/>
+<path fill="#e1bf6a" d="m89 54 8 0m5 0h6" stroke="#e1bf6a" stroke-width="3"/>
+<path fill="#b4a58b" d="m68 75-27 14 11 30 23-13m55-31 18 12 9 23-17 10-14-29"/>
+<path fill="#817a67" d="m42 90-10 40 20 7 9-33m85-17 12 10-3 25-18 0-6-22"/>
+<path fill="#9b927b" d="m73 126-7 30h26l8-30m10 0 1 30h27l-10-30"/>
+<path fill="#726d60" d="m70 143 23 1-1 12H65m46-12 23-1 5 13h-28"/>
+<path fill="#c2b592" d="m77 86 20-6 22 7-5 26-17 10-18-10Z"/>
+<path fill="none" stroke="#6f715e" stroke-width="3" d="m89 87 8 10 10-8m-10 8-5 18m11-76-5 9 7 10m-44 26 7 10-6 13"/>
+<path fill="#d1c6ac" d="m36 88 0-46 7-14 7 14-6 47Z"/>
+<path fill="#8d7550" d="m28 89 28 0v7H28Zm10 7h8v24h-8Z"/>
+<path fill="#74a987" d="m119 119 13 9-3 8-15-6m-47 5-8 7 2 9 10-3"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#ab9974" stroke-width="2" opacity=".7"/>
+</svg>

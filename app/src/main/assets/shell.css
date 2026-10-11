@@ -1,0 +1,21 @@
+html { scroll-padding-top: 65px; }
+body { overscroll-behavior-y: contain; }
+.wrap { padding-top: max(24px, env(safe-area-inset-top)); }
+.backup-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.backup-controls label { display: inline-flex; align-items: center; }
+.backup-file { display: none; }
+.world-entry { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
+.world-entry .btn { margin: 0; }
+.game-home .world-link { background: linear-gradient(100deg, #164a45, #2c2353); border-color: #77d1bb; }
+nav { z-index: 30; }
+nav button { min-height: 48px; min-width: 0; font-size: .72rem; padding-inline: 2px; }
+.storage-notice { border: 1px solid #a9784e; color: #ffe2aa; padding: 12px; border-radius: 12px; }
+@media (max-width: 390px) {
+  .wrap { padding-inline: 10px; }
+  nav { gap: 1px; padding-inline: 3px; }
+  nav button { font-size: .65rem; }
+  .world-entry { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Besouro do Campo</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#638041" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#638041"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#638041" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="none" stroke="#5b6641" stroke-width="6" d="m65 83-24-12-12 11m34 20-31 1-8 15m43 5-22 14-5 18m91-72 23-12 12 10m-33 21 30 2 7 14m-42 6 20 15 6 17"/>
+<ellipse fill="#526438" cx="97" cy="107" rx="39" ry="46"/>
+<path fill="#86a94d" d="M96 66q-40 0-37 49 4 28 37 38Zm2 0q40 0 37 49-4 28-37 38Z"/>
+<path fill="#b7c968" d="M86 76q-18 5-18 32 10-5 13-14Z" stroke="none"/>
+<path fill="#4b5c33" d="m74 68 7-20 32 1 9 22-24 13Z"/>
+<path fill="#bea758" d="m85 49 1-19 13 9 12-10-1 22"/>
+<path fill="none" stroke="#384532" stroke-width="4" d="m81 53-12-14-11 2m53 11 12-15 11 2"/>
+<circle fill="#e8d78b" cx="85" cy="61" r="4"/><circle fill="#e8d78b" cx="108" cy="61" r="4"/>
+<path fill="none" stroke="#c8cd7c" stroke-width="3" d="m76 112 13-6m15 0 15 7m-39 14 9-5m14 0 10 6"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#638041" stroke-width="2" opacity=".7"/>
+</svg>

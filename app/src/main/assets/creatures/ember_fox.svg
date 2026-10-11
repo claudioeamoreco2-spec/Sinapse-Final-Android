@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Raposa de Brasa</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#b65a39" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b65a39"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#b65a39" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#d67537" d="M75 119Q22 144 19 92q11 8 13-3-13-28 7-47 2 25 15 21 5-23 20-23-10 26 11 36l16 35Z"/>
+<path fill="#ffd66f" d="M72 111q-26 13-33-11 14 4 15-10-11-13-5-27 10 16 21 21Z"/>
+<path fill="#cc6b32" d="m67 100 37-12 28 13 14 24-13 19h-13l1-24-20-7-10 32H79l-2-23Z"/>
+<path fill="#e59149" d="m97 92 6-42 20 20 27-16-5 37 17 18-24 16-33-14Z"/>
+<path fill="#ffe0a1" d="m99 92 19 5 14-3 30 15-23 16-32-14Z"/>
+<path fill="#71483b" d="m108 58 11 16-13 4m40-17-7 20-10-5"/>
+<path fill="#f7d15d" d="m116 85 11 1-5 6-6-2Zm19 0 9-3-4 8-5 1Z"/>
+<path fill="#3c3531" d="m153 102 10 7-11 6-6-6Z"/>
+<path fill="#fff0cb" d="m123 127-2 17h13l8-16m-58 3-5 14h13l6-18"/>
+<path fill="none" stroke="#ffc65b" stroke-width="3" d="m29 51-6-10m39-9 4-10m20 38 8-8"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#b65a39" stroke-width="2" opacity=".7"/>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Golem de Casca</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#456f42" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#456f42"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#456f42" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#644c37" d="m68 71 9-21h41l9 21 8 43-16 20H71l-16-20Z"/>
+<path fill="#8d7049" d="m76 79 5-32 29 5 13 23-10 21-34-3Z"/>
+<path fill="#4e442e" d="m66 84-23 7-15 33 16 11 18-26m61-27 23 13 20 26-13 14-21-27"/>
+<path fill="#967950" d="m48 92-12 27 11 8 17-34m70-2 7 26 13 7 7-8-14-21"/>
+<path fill="#60462f" d="m76 129-8 23 21 3 10-23m13-3 5 25 22-3-12-24"/>
+<path fill="#9c8156" d="m67 152 25 3 6-10-24-5m42 6 1 10 23-5-4-9"/>
+<path fill="#3e743e" d="m66 69-14-17 19 1-1-25 18 15 14-25 7 27 26-10-11 28 19 3-17 17Z"/>
+<path fill="#86ba62" d="m82 52 5-16 9 15m12-2 14-9-5 18"/>
+<path fill="#293b2d" d="m81 70 13 4-11 6Zm24 5 12-6-1 11Z"/>
+<path fill="#b0e376" d="m82 74 8 1-5 3Zm27 1 7-3-1 6Z" stroke="none"/>
+<path fill="none" stroke="#362e22" stroke-width="3" d="m89 54 9 10-2 20m-14 15 4 18-11 7m34-22-5 21 11 3m-66-28 7 5-9 17m82-17 8 8"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#456f42" stroke-width="2" opacity=".7"/>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Morcego da Caverna</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#7a537e" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7a537e"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#7a537e" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#593f67" d="M84 92 62 45 40 69 20 52l3 58 22-10 16 27 22-9m28-26 21-48 22 25 18-17-2 60-23-11-16 27-22-11Z"/>
+<path fill="#96657f" d="m27 65 17 17 17-28 19 52-18 7-14-24-18 9Zm135 0-16 18-14-29-21 52 18 7 15-23 18 9Z"/>
+<path fill="none" stroke="#ad7891" stroke-width="3" d="m43 82 1 13m17-41 0 59m85-30-2 14m-12-42-3 58"/>
+<ellipse fill="#776080" cx="97" cy="111" rx="23" ry="32"/>
+<path fill="#8d7794" d="m78 82-8-33 25 19 13 0 17-22-2 35-14 22H90Z"/>
+<path fill="#cc99a5" d="m76 60 6 19 7-7m29-13-8 15 8 5"/>
+<path fill="#45354c" d="m84 85 11 1-5 7Zm20 1 11-3-3 9Z"/>
+<path fill="#f5be68" d="m86 88 6 0-3 2m17-1 6-2-3 4" stroke="#f5be68" stroke-width="2"/>
+<path fill="#e7dac0" d="m87 105 5 9 3-8m7 0 4 8 4-10"/>
+<path fill="none" stroke="#b89fae" stroke-width="3" d="m88 140-5 10 8-3m15-7 5 10-8-3"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#7a537e" stroke-width="2" opacity=".7"/>
+</svg>

@@ -1,29 +1,128 @@
 (() => {
   "use strict";
-  const q = (s) => document.querySelector(s),
-    qa = (s) => [...document.querySelectorAll(s)];
-  const save = (k, v) => localStorage.setItem("sf2_" + k, JSON.stringify(v));
-  const load = (k, d) => {
-    try {
-      const v = JSON.parse(localStorage.getItem("sf2_" + k));
-      return v ?? d;
-    } catch {
-      return d;
+  // Pure reader rules are shared by the browser and the regression tests.
+  const compactText = (text) => text.replace(/\s+/gu, "");
+  const safeImage = (src) => typeof src === "string" && src.length < 3000000 &&
+    (/^scenes\/[a-zA-Z0-9_./-]+\.(?:webp|png|jpe?g|svg)$/i.test(src) && !src.includes("..") ||
+      /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(src));
+  function paginate(text, target = 1400) {
+    target = Math.max(32, Number.isFinite(target) ? Math.floor(target) : 1400);
+    const pages = [];
+    let offset = 0;
+    while (offset < text.length) {
+      let end = Math.min(text.length, offset + target);
+      if (end < text.length) {
+        const breakAt = text.lastIndexOf("\n\n", end);
+        const wordAt = text.lastIndexOf(" ", end);
+        if (breakAt > offset + target / 2) end = breakAt + 2;
+        else if (wordAt > offset + target / 2) end = wordAt + 1;
+        // Never divide a surrogate pair in an imported Unicode text.
+        if (/^[\uDC00-\uDFFF]$/.test(text[end] || "")) end--;
+      }
+      pages.push(text.slice(offset, end));
+      offset = end;
     }
+    return pages;
+  }
+  function validateBook(book, additionsOnly = false) {
+    if (!book || !Array.isArray(book.chapters) || !book.chapters.length || book.chapters.length > 24)
+      throw new Error("O JSON deve conter chapters com capítulos integrais.");
+    const numbers = new Set();
+    return book.chapters.map((chapter) => {
+      if (!chapter || !Number.isInteger(chapter.number) || chapter.number < 1 || chapter.number > 24 ||
+          additionsOnly && chapter.number < 13 || numbers.has(chapter.number))
+        throw new Error("Use números únicos de capítulos entre " + (additionsOnly ? "13" : "1") + " e 24.");
+      numbers.add(chapter.number);
+      if (typeof chapter.title !== "string" || !chapter.title.trim() || chapter.title.length > 200 ||
+          typeof chapter.text !== "string" || !chapter.text.trim() || chapter.text.length > 2000000)
+        throw new Error("Cada capítulo precisa de título e texto integral, até 2 MB.");
+      const normalizedTitle = chapter.title.trim().replace(/\s+/gu, " ").normalize("NFC");
+      if (chapter.number === 24 && normalizedTitle.toLocaleLowerCase("pt-BR") !== "ecos de aço e sangue")
+        throw new Error('O capítulo 24 deve se chamar "Ecos de Aço e Sangue".');
+      const pages = chapter.pages === undefined ? paginate(chapter.text) : chapter.pages;
+      if (!Array.isArray(pages) || !pages.length || pages.length > 2000 ||
+          pages.some((page) => typeof page !== "string" || !page.trim()) ||
+          compactText(pages.join("")) !== compactText(chapter.text))
+        throw new Error("As páginas devem preservar todo o texto, na mesma ordem.");
+      const images = (Array.isArray(chapter.images) ? chapter.images : []).slice(0, 24).map((img) => {
+        const source = typeof img === "string" ? { src: img } : img;
+        if (!source || !safeImage(source.src)) throw new Error("Imagem inválida: use scenes/ ou imagem PNG/JPEG/WebP embutida.");
+        return { src: source.src, caption: String(source.caption || "Ilustração fornecida pelo autor").slice(0, 200),
+          alt: String(source.alt || source.caption || "Ilustração do capítulo").slice(0, 200),
+          page: Number.isInteger(source.page) ? Math.max(0, Math.min(pages.length - 1, source.page)) : 0 };
+      });
+      return { number: chapter.number, title: chapter.number === 24 ? "Ecos de Aço e Sangue" : chapter.title.trim(), text: chapter.text, pages: [...pages], images };
+    }).sort((a, b) => a.number - b.number);
+  }
+  function mergeBooks(originals, additions) {
+    const merged = [...originals];
+    for (const chapter of additions) {
+      if (chapter.number < 13 || merged.some((item) => item.number === chapter.number))
+        throw new Error("O capítulo " + chapter.number + " já existe e foi preservado.");
+      merged.push(chapter);
+    }
+    return merged.sort((a, b) => a.number - b.number);
+  }
+  function normalizeHighlights(ranges, text) {
+    if (!Array.isArray(ranges)) return [];
+    const sorted = ranges.slice(0, 500).filter((range) => range && Number.isInteger(range.start) && Number.isInteger(range.end) &&
+      range.start >= 0 && range.end > range.start && range.end <= text.length &&
+      (!range.quote || text.slice(range.start, range.end) === range.quote)).sort((a, b) => a.start - b.start);
+    const result = [];
+    for (const range of sorted) {
+      const previous = result[result.length - 1];
+      if (previous && range.start <= previous.end) previous.end = Math.max(previous.end, range.end);
+      else result.push({ start: range.start, end: range.end });
+    }
+    return result.map((range) => ({ ...range, quote: text.slice(range.start, range.end) }));
+  }
+  function completeChapter(reading, number, pageCount) {
+    if (!Number.isInteger(pageCount) || pageCount < 1 || pageCount > 2000) return false;
+    const progress = reading[number];
+    if (!progress || progress.completed || !Array.isArray(progress.visited) ||
+        !Array.from({ length: pageCount }, (_, page) => page).every((page) => progress.visited.includes(page))) return false;
+    progress.completed = true;
+    progress.completedAt = new Date().toISOString();
+    return true;
+  }
+  function claimChapterReward(player, number) {
+    if (!Number.isInteger(number) || number < 1 || number > 24) return false;
+    if (!Array.isArray(player.completedRewards)) player.completedRewards = [];
+    if (player.completedRewards.includes(number)) return false;
+    player.completedRewards.push(number);
+    return true;
+  }
+  const core = { paginate, validateBook, mergeBooks, normalizeHighlights, completeChapter, claimChapterReward, safeImage };
+  if (typeof module !== "undefined" && module.exports) module.exports = core;
+  if (typeof document === "undefined") return;
+  const q = (selector) => document.querySelector(selector);
+  const qa = (selector) => [...document.querySelectorAll(selector)];
+  const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+  let storageWarning = false;
+  const save = (key, value) => {
+    if (window.SinapseRestoring) return true;
+    try { localStorage.setItem("sf2_" + key, JSON.stringify(value)); return true; }
+    catch { if (!storageWarning) { storageWarning = true; toast("Não foi possível salvar: armazenamento indisponível ou cheio."); } return false; }
   };
-  const state = load("state", {
-    name: "Jogador",
-    xp: 0,
-    points: 0,
-    chapter: 1,
-    unlocked: ["caleb", "oliver", "kaelum", "cibele"],
-    scenes: 1,
-    bestRace: 0,
-    puzzle: false,
-    quiz: false,
-  });
-  const persist = () => save("state", state);
-  let readerSize = load("readerSize", 19);
+  const load = (key, fallback) => {
+    try { const value = JSON.parse(localStorage.getItem("sf2_" + key)); return value ?? fallback; }
+    catch { return fallback; }
+  };
+  const defaults = { name: "Jogador", xp: 0, points: 0, chapter: 1,
+    unlocked: ["caleb", "oliver", "kaelum", "cibele"], scenes: 1, bestRace: 0, puzzle: false, quiz: false, completedRewards: [] };
+  const loadedState = load("state", {});
+  const state = { ...defaults, ...(loadedState && typeof loadedState === "object" ? loadedState : {}) };
+  for (const key of ["xp", "points", "chapter", "scenes", "bestRace"]) state[key] = Math.max(key === "chapter" ? 1 : 0, Number.isFinite(state[key]) ? Math.floor(state[key]) : defaults[key]);
+  state.xp = Math.min(99, state.xp);
+  state.points = Math.min(100000000, state.points);
+  state.chapter = Math.min(100000, state.chapter);
+  if (!Array.isArray(state.unlocked)) state.unlocked = [...defaults.unlocked];
+  state.completedRewards = Array.isArray(state.completedRewards) ? [...new Set(state.completedRewards.filter((number) => Number.isInteger(number) && number >= 1 && number <= 24))] : [];
+  state.name = typeof state.name === "string" ? state.name.slice(0, 20) : "Jogador";
+  const storedReading = load("reading", {});
+  const reading = storedReading && typeof storedReading === "object" && !Array.isArray(storedReading) ? storedReading : {};
+  const persist = () => { if (window.SinapseRestoring) return true; const stateSaved = save("state", state); const readingSaved = save("reading", reading); return stateSaved && readingSaved; };
+  let readerSize = Math.max(16, Math.min(28, Number(load("readerSize", 19)) || 19));
   const chars = [
     {
       id: "caleb",
@@ -272,392 +371,378 @@
   chars.forEach((character) => {
     character.img = `characters/v2/${character.id}.webp`;
   });
-  const ch = [
-    {
-      n: 1,
-      title: "O Brilho da Tempestade",
-      sub: "Caleb contra Oliver em uma Nerakar destruída.",
-      open: true,
-    },
-    {
-      n: 2,
-      title: "O Olho da Tempestade",
-      sub: "Um ano antes: o raio escolhe Caleb e o mundo muda.",
-      open: true,
-    },
-    {
-      n: 3,
-      title: "A Descoberta do Ponto Fraco",
-      sub: "Lira, Eron e a origem da máquina Sinapse Final.",
-      open: true,
-    },
-    {
-      n: 4,
-      title: "O Anel de Tharzul",
-      sub: "Os cinco fugitivos encaram o julgamento perfeito.",
-      open: true,
-    },
-  ];
-  let importedChapters = [];
-  const excerpts = {
-    2: [
-      `O mundo nem sempre foi assim. Antes da tempestade, Kaelum lançou através de um vulcão uma fumaça que fugia à explicação da ciência. As cidades transformaram aquela presença em tecnologia — máquinas, implantes e sistemas que aprendiam sozinhos. Então o céu rasgou.`,
-      `Caleb caminhava pelas ruas quando as nuvens giraram. O azul virou roxo. Um raio púrpura o atingiu no peito e o lançou num vazio sem céu, chão ou tempo. Ali, uma consciência falou dentro dele: sobreviva, ou eu tomo o que sobrar.`,
-      `Quando acordou, trovões dançavam em seus dedos. Oliver chegou sob a chuva e viu o impossível pela primeira vez. Mais tarde, juntos, salvaram Cibele de criaturas de carne e metal e correram para um bunker escondido.`,
-      `No bunker, Caleb encontrou sinais de recrutamento forçado, testes e prisioneiros. A amizade rachou. Caleb saiu carregando Cibele, enquanto a tempestade parecia rir dos dois antigos irmãos.`,
-    ],
-    3: [
-      `Caleb desperta numa casa de madeira depois de dois dias inconsciente. Cibele está viva. Ao lado do colchão, uma garota chamada Lira troca seus curativos e diz que sabia que ele precisava voltar.`,
-      `Lira revela que consegue sentir ferimentos e acelerar a recuperação. Na floresta, os dois encontram um velho impossível de mover. Ele segura Lira, derruba Caleb com uma garrafa e o aprisiona.`,
-      `O velho é Eron Valemont. Uma visão mostra a máquina Sinapse Final fundindo quarenta e cinco pessoas em seu corpo. Engenheiros, soldados e assassinos agora existem como ecos dentro dele.`,
-      `Eron testa o sangue de Caleb, mas encontra um corpo comum: a tempestade não é genética. Enquanto isso, Oliver reúne os cinco fugitivos e prepara o Núcleo de Kaelum.`,
-    ],
-    4: [
-      `Lazhar e Miro chegam à Zona Morta em busca do Condutor Elemental. O hacker rompe a rede da vila; Miro apaga a presença e atravessa sensores como um fantasma.`,
-      `O Condutor ativa uma armadilha. Lazhar usa discos de energia e invade armas inimigas. Miro endurece a pele como obsidiana. Eles escapam com a peça.`,
-      `Tharn, Eko e Mirael fracassam diante do Anel de Tharzul. A relíquia não mostra ilusões: ela revela o que cada um fez e tudo que ainda poderia fazer.`,
-      `O anel foi criado para produzir justiça perfeita. Alimentado pela culpa de milhares, enlouqueceu o rei Tharzul. Agora continua pulsando nas profundezas de Nerakar, esperando alguém capaz de suportar sua verdade.`,
-    ],
-  };
-  function toast(t) {
-    let x = q(".toast");
-    if (!x) {
-      x = document.createElement("div");
-      x.className = "toast";
-      document.body.append(x);
-    }
-    x.textContent = t;
-    x.classList.add("show");
-    setTimeout(() => x.classList.remove("show"), 1800);
+  state.unlocked = [...new Set(state.unlocked.filter((id) => chars.some((character) => character.id === id)))];
+  let chapters = [], bookLoaded = false, bookError = "";
+  let currentReader = null, speech = null, speechButton = null, toastTimer = 0;
+  let gameCleanup = null, currentScreen = q(".page:not(.hidden)")?.id || "home";
+  let codexQuery = "", codexFilter = "all";
+  function toast(message) {
+    let target = q(".toast");
+    if (!target) { target = document.createElement("div"); target.className = "toast"; target.setAttribute("role", "status"); document.body.append(target); }
+    target.textContent = message;
+    target.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => target.classList.remove("show"), 2600);
   }
-  function reward(points, msg) {
-    state.points += points;
-    state.xp += points;
-    while (state.xp >= 100) {
-      state.xp -= 100;
-      state.chapter++;
-      toast("Nível aumentado!");
-    }
-    persist();
-    refreshHome();
-    toast(`+${points} pontos • ${msg}`);
+  function reward(points, message) {
+    if (!Number.isFinite(points) || points <= 0) return;
+    const amount = Math.min(1000, Math.floor(points));
+    state.points += amount; state.xp += amount;
+    while (state.xp >= 100) { state.xp -= 100; state.chapter++; }
+    const saved = persist(); refreshHome();
+    toast(`+${amount} pontos • ${message}${saved ? "" : " • salvamento indisponível"}`);
   }
   function refreshHome() {
-    const n = q("#homeName"),
-      p = q("#homePoints"),
-      l = q("#homeLevel"),
-      bar = q("#homeXp");
-    if (n) n.textContent = state.name;
-    if (p) p.textContent = state.points + " pontos";
-    if (l) l.textContent = "Nível " + state.chapter;
-    if (bar) bar.style.width = state.xp + "%";
+    if (q("#homeName")) q("#homeName").textContent = state.name;
+    if (q("#homePoints")) q("#homePoints").textContent = state.points + " pontos";
+    if (q("#homeLevel")) q("#homeLevel").textContent = "Nível " + state.chapter;
+    if (q("#homeXp")) q("#homeXp").style.width = Math.min(100, state.xp) + "%";
   }
-  q("#home").insertAdjacentHTML(
-    "afterbegin",
-    `<div class="game-home"><div class="logo">SINAPSE<span>ϟ</span><br>FINAL</div><div class="tagline">O destino desperta na tempestade</div><div class="player-chip"><div class="avatar">C</div><div><strong id="homeName"></strong><small><span id="homeLevel"></span> • <span id="homePoints"></span></small><div class="xp"><i id="homeXp"></i></div></div></div><div class="main-menu"><button class="menu-btn primary" data-go="story">Continuar história</button><button class="menu-btn" data-go="arcade">Jogar</button><button class="menu-btn" data-go="characters">Personagens</button><button class="menu-btn" data-go="profile">Login e perfil</button></div></div>`,
-  );
+  q("#home").insertAdjacentHTML("afterbegin", `<div class="game-home"><div class="logo">SINAPSE<span>ϟ</span><br>FINAL</div><div class="tagline">Ecos de Nerakar</div><div class="player-chip"><div class="avatar">C</div><div><strong id="homeName"></strong><small><span id="homeLevel"></span> • <span id="homePoints"></span></small><div class="xp"><i id="homeXp"></i></div></div></div><div class="main-menu"><button class="menu-btn primary" id="continueStory">Continuar leitura</button><button class="menu-btn" data-go="rpg">Explorar Nerakar</button><button class="menu-btn" data-go="arcade">Jogos</button><button class="menu-btn" data-go="characters">Personagens</button><button class="menu-btn" data-go="profile">Perfil offline</button></div></div>`);
+  function imagesFor(chapter) {
+    const provided = chapter.images?.length ? chapter.images : window.SinapseChapterScenes?.[chapter.number];
+    if (provided?.length) return provided.filter((image) => safeImage(image.src));
+    return chapter.number <= 12 ? [{ src: `scenes/chapters/chapter-${chapter.number}.webp`, caption: "Ilustração recuperada", alt: "Ilustração do capítulo " + chapter.number, page: 0 }] : [];
+  }
   function renderStoryLibrary() {
-    const books = importedChapters.length
-      ? importedChapters
-      : ch.map((c) => ({
-          number: c.n,
-          title: c.title,
-          pages: new Array(c.n === 1 ? 15 : 4),
-          text: c.sub,
-        }));
-    q("#story").innerHTML =
-      `<header class="screen-head"><div class="eyebrow">Modo história</div><h1>Arquivo de Nerakar</h1><p class="lead">Leia o livro, descubra cenas e libere personagens.</p></header><div class="stat-row"><div class="stat"><strong>${books.length}</strong><span>capítulos</span></div><div class="stat"><strong id="sceneCount">${state.scenes}/${books.length * 4}</strong><span>cenas</span></div><div class="stat"><strong>${state.unlocked.length}/22</strong><span>códice</span></div></div><div class="section-title"><h2>Capítulos</h2><small>texto integral do autor</small></div><div class="chapter-list">${books.map((c) => `<button class="chapter-tile" data-chapter="${c.number}" style="background-image:linear-gradient(0deg,rgba(7,5,16,.96),rgba(7,5,16,.08) 72%),url('scenes/chapters/chapter-${c.number}.webp')"><span class="status">${c.pages.length} páginas</span><div class="eyebrow">Capítulo ${c.number}</div><h2>${c.title}</h2><p>${c.text.slice(0, 115).replace(/\s+/g, " ")}…</p></button>`).join("")}</div><div class="section-title"><h2>Cenas conquistadas</h2><small>toque para ampliar</small></div><div class="scene-strip">${books.slice(0, 4).map((c) => `<button class="scene-thumb" data-chapter="${c.number}" style="background-image:linear-gradient(0deg,rgba(7,5,16,.9),transparent 72%),url('scenes/chapters/chapter-${c.number}.webp')"><b>${c.title}</b></button>`).join("")}</div>`;
+    const pending = Array.from({ length: 24 }, (_, index) => index + 1).filter((number) => !chapters.some((chapter) => chapter.number === number));
+    const completed = chapters.filter((chapter) => reading[chapter.number]?.completed).length;
+    q("#story").innerHTML = `<header class="screen-head"><div class="eyebrow">Biblioteca preservada</div><h1>Arquivo de Nerakar</h1><p class="lead">Progresso, marca-textos e comentários ficam neste aparelho.</p></header><div class="stat-row"><div class="stat"><strong>${chapters.length}</strong><span>disponíveis</span></div><div class="stat"><strong>${completed}</strong><span>concluídos</span></div><div class="stat"><strong>${pending.length}</strong><span>pendentes</span></div></div><div class="notice" role="status">${bookError ? escapeHTML(bookError) : !bookLoaded ? "Carregando o livro recuperado…" : `${chapters.filter(chapter => chapter.number <= 12).length} capítulos recuperados e preservados. ${pending.filter(number => number >= 13).length} textos de 13–24 ainda aguardam uma fonte acessível do autor.`}</div><div class="import-panel card"><h2>Integrar capítulos do autor</h2><p class="small">Importe JSON com chapters: number, title e text. pages e images são opcionais. Capítulos existentes são preservados; nenhum texto novo é criado automaticamente.</p><label class="btn alt" for="chapterImport">Importar capítulos 13–24</label><input id="chapterImport" type="file" accept=".json,application/json" class="visually-hidden"><p id="importStatus" class="small" role="status">O capítulo 24 está reservado para “Ecos de Aço e Sangue”.</p></div><div class="section-title"><h2>Capítulos disponíveis</h2><small>${chapters.length ? "texto recuperado ou importado" : "aguardando recuperação"}</small></div><div class="chapter-list">${chapters.map((chapter) => {
+      const images = imagesFor(chapter), progress = reading[chapter.number];
+      return `<button class="chapter-tile" data-chapter="${chapter.number}">${images.length ? `<img class="chapter-tile-image" src="${escapeHTML(images[0].src)}" alt="" loading="lazy">` : ""}<span class="status">${progress?.completed ? "Concluído" : chapter.pages.length + " páginas"}</span><div class="eyebrow">Capítulo ${chapter.number}</div><h2>${escapeHTML(chapter.title)}</h2><p>${escapeHTML(chapter.text.slice(0, 100).replace(/\s+/g, " "))}…</p><small>${chapter.number <= 12 ? "Fonte recuperada" : "Texto importado pelo usuário"} • ${images.length} ilustrações disponíveis</small></button>`;
+    }).join("")}</div><div class="section-title"><h2>Textos pendentes</h2><small>sem conteúdo inventado</small></div><div class="pending-chapters">${pending.map((number) => `<div class="pending-chapter"><b>Capítulo ${number}</b><span>${number === 24 ? "Ecos de Aço e Sangue" : "Texto e título aguardando o autor"}</span></div>`).join("") || "Todos os números solicitados têm uma fonte integrada."}</div>`;
+    q("#chapterImport").addEventListener("change", importChapters);
   }
-  renderStoryLibrary();
-  fetch("chapters.json")
-    .then((response) => response.json())
-    .then((book) => {
-      importedChapters = book.chapters;
+  async function importChapters(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const status = q("#importStatus");
+    try {
+      if (!bookLoaded) throw new Error("Aguarde o livro recuperado carregar antes de importar.");
+      if (file.size > 20000000) throw new Error("Use um arquivo JSON de até 20 MB.");
+      const additions = validateBook(JSON.parse(await file.text()), true);
+      const merged = mergeBooks(chapters, additions);
+      const extra = merged.filter((chapter) => chapter.number >= 13);
+      // Write successfully before changing the in-memory library.
+      if (!save("importedChapters", extra)) throw new Error("Importação não salva; libere espaço e tente novamente.");
+      chapters = merged;
       renderStoryLibrary();
-    })
-    .catch(() => toast("O livro não pôde ser carregado"));
-  q("#arcade").innerHTML =
-    `<header class="screen-head"><div class="eyebrow">Central de jogos</div><h1>Treine. Corra. Descubra.</h1><p class="lead">Ganhe pontos para desbloquear o códice.</p></header><div class="mode-list"><button class="game-mode" data-play="race"><span class="icon">🏎</span><span><h3>Fuga de Nerakar</h3><p>Desvie dos destroços sob a tempestade.</p></span><b>+XP</b></button><button class="game-mode" data-play="puzzle"><span class="icon">◈</span><span><h3>Sinapses</h3><p>Encontre os pares do universo.</p></span><b>+80</b></button><button class="game-mode" data-go="quiz"><span class="icon">✦</span><span><h3>Quiz da tempestade</h3><p>Teste o que aprendeu no capítulo 1.</p></span><b>+60</b></button><button class="game-mode" data-go="game"><span class="icon">ϟ</span><span><h3>Escolhas sob a chuva</h3><p>Uma rota narrativa alternativa.</p></span><b>Jogar</b></button></div><div id="gameStage"></div>`;
+      q("#importStatus").textContent = `${additions.length} capítulos importados e salvos neste aparelho. Textos fornecidos pelo usuário.`;
+      toast("Capítulos integrados sem substituir os originais.");
+      document.dispatchEvent(new CustomEvent("sinapse:chapters", { bubbles: true, detail: { chapters: chapters.length } }));
+    } catch (error) { status.textContent = error.message; toast(error.message); }
+    event.target.value = "";
+  }
+  async function loadBook() {
+    try {
+      const book = window.AndroidContent?.readChapters ? JSON.parse(window.AndroidContent.readChapters()) : await fetch("chapters.json").then((response) => { if (!response.ok) throw new Error("HTTP " + response.status); return response.json(); });
+      chapters = validateBook(book);
+      try {
+        const extra = load("importedChapters", []);
+        if (Array.isArray(extra) && extra.length) {
+          // An updated APK may already include a formerly imported chapter.
+          const additions = validateBook({ chapters: extra }, true).filter((chapter) => !chapters.some((original) => original.number === chapter.number));
+          chapters = mergeBooks(chapters, additions);
+        }
+      } catch { toast("Importação local inválida foi preservada, mas não pôde ser aberta."); }
+      bookLoaded = true;
+      renderStoryLibrary();
+      if (currentScreen === "chapterReader" && !currentReader) {
+        const resumeNumber = Number(load("lastReading", 1));
+        if (chapters.some((chapter) => chapter.number === resumeNumber)) openChapter(resumeNumber);
+        else navigate("story");
+      }
+      document.dispatchEvent(new CustomEvent("sinapse:chapters", { bubbles: true, detail: { chapters: chapters.length } }));
+    } catch (error) {
+      bookError = "O arquivo chapters.json não pôde ser aberto. Os textos existentes não foram substituídos. " + error.message;
+      renderStoryLibrary(); toast("Não foi possível abrir o livro recuperado.");
+    }
+  }
+  function navigate(id) {
+    if (!q("#" + id)) { toast("Esta tela ainda não está disponível."); return; }
+    const button = document.createElement("button"); button.dataset.go = id;
+    document.body.append(button); button.click(); button.remove();
+  }
+  function progressFor(chapter) {
+    let progress = reading[chapter.number];
+    if (!progress || typeof progress !== "object" || Array.isArray(progress)) progress = reading[chapter.number] = {};
+    if (!Array.isArray(progress.visited)) progress.visited = [];
+    progress.visited = [...new Set(progress.visited.filter((page) => Number.isInteger(page) && page >= 0 && page < chapter.pages.length))];
+    progress.page = Math.max(0, Math.min(chapter.pages.length - 1, Number.isInteger(progress.page) ? progress.page : Math.floor(Number(load(`chapter_${chapter.number}_page`, 0))) || 0));
+    if (!progress.highlights || typeof progress.highlights !== "object" || Array.isArray(progress.highlights)) progress.highlights = {};
+    if (!progress.comments || typeof progress.comments !== "object" || Array.isArray(progress.comments)) progress.comments = {};
+    return progress;
+  }
+  function openChapter(number) {
+    const chapter = chapters.find((item) => item.number === number);
+    if (!chapter) { toast(bookLoaded ? "Texto do capítulo ainda indisponível." : "Aguarde o carregamento do livro."); return; }
+    stopSpeech();
+    currentReader = { chapter, progress: progressFor(chapter) };
+    renderReader(); navigate("chapterReader");
+  }
+  function renderHighlightedText(target, text, ranges) {
+    target.replaceChildren();
+    let position = 0;
+    for (const range of normalizeHighlights(ranges, text)) {
+      target.append(document.createTextNode(text.slice(position, range.start)));
+      const mark = document.createElement("mark"); mark.textContent = text.slice(range.start, range.end); target.append(mark);
+      position = range.end;
+    }
+    target.append(document.createTextNode(text.slice(position)));
+  }
+  function selectedOffsets(target) {
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount || selection.isCollapsed) return null;
+    const range = selection.getRangeAt(0);
+    if (!target.contains(range.startContainer) || !target.contains(range.endContainer)) return null;
+    const before = document.createRange(); before.selectNodeContents(target); before.setEnd(range.startContainer, range.startOffset);
+    const start = before.toString().length, end = start + range.toString().length;
+    return { start, end };
+  }
+  function renderReader() {
+    if (!currentReader) return;
+    stopSpeech();
+    const { chapter, progress } = currentReader, page = progress.page, text = chapter.pages[page];
+    if (!progress.visited.includes(page)) progress.visited.push(page);
+    progress.updatedAt = new Date().toISOString();
+    save("lastReading", chapter.number); const progressSaved = persist();
+    const allImages = imagesFor(chapter);
+    const image = [...allImages].sort((a, b) => (a.page || 0) - (b.page || 0)).filter((item) => (item.page || 0) <= page).pop() || allImages[0];
+    const comments = (Array.isArray(progress.comments[page]) ? progress.comments[page] : []).filter((comment) =>
+      comment && typeof comment === "object" && typeof comment.text === "string").slice(0, 50).map((comment) => ({
+        author: typeof comment.author === "string" ? comment.author.slice(0, 20) : "Jogador",
+        text: comment.text.slice(0, 1000), createdAt: typeof comment.createdAt === "string" ? comment.createdAt : ""
+      }));
+    progress.comments[page] = comments;
+    progress.highlights[page] = normalizeHighlights(progress.highlights[page], text);
+    q("#chapterReader").innerHTML = `<button class="back" data-go="story">← Capítulos</button><div class="reader-shell"><header class="screen-head"><div class="eyebrow">Capítulo ${chapter.number} • página ${page + 1}/${chapter.pages.length}</div><h1>${escapeHTML(chapter.title)}</h1></header>${image ? `<figure class="reader-scene"><img class="chapter-cover" src="${escapeHTML(image.src)}" alt="${escapeHTML(image.alt || "Ilustração do capítulo")}"><figcaption>${escapeHTML(image.caption || "Ilustração disponível")}</figcaption></figure>` : '<p class="notice">Imagens deste capítulo aguardam material do autor.</p>'}<div class="reader-progress" role="progressbar" aria-label="Páginas abertas" aria-valuemin="0" aria-valuemax="${chapter.pages.length}" aria-valuenow="${progress.visited.length}"><i style="width:${100 * progress.visited.length / chapter.pages.length}%"></i></div><article id="chapterPageText" class="card chapter" style="font-size:${readerSize}px;white-space:pre-wrap"></article><div class="book-panel"><label for="upgradeFont">Tamanho da letra</label><input id="upgradeFont" type="range" min="16" max="28" value="${readerSize}"><div class="highlight-actions"><button class="btn alt" id="highlightSelection">Marcar seleção</button><button class="btn alt" id="clearHighlights">Limpar marcas desta página</button></div><p class="small">Selecione um trecho do texto e toque em Marcar seleção. Marcas e comentários são locais.</p></div>${allImages.length > 1 ? `<details class="chapter-gallery"><summary>${allImages.length} ilustrações disponíveis</summary>${allImages.map((item) => `<figure><img src="${escapeHTML(item.src)}" alt="${escapeHTML(item.alt || item.caption || "Ilustração")}" loading="lazy"><figcaption>${escapeHTML(item.caption || "Ilustração fornecida")}</figcaption></figure>`).join("")}</details>` : ""}<section class="reader-comments card"><h2>Comentários desta página</h2><p class="small">${comments.length} comentários salvos neste aparelho. Sem envio online.</p><div id="pageComments"></div><form id="commentForm"><label class="field" for="commentText">Seu comentário<textarea id="commentText" maxlength="1000" rows="3" required></textarea></label><button class="btn alt" type="submit">Salvar comentário offline</button></form></section><div class="reader-actions"><button class="btn alt" id="uPrev" ${page === 0 ? "disabled" : ""} aria-label="Página anterior">←</button><button class="btn alt" id="uVoice">🔊 Voz</button><button class="btn primary" id="uNext">${page === chapter.pages.length - 1 ? progress.completed ? "Concluído ✓" : "Concluir" : "Próxima →"}</button></div><p class="small">${progress.visited.length}/${chapter.pages.length} páginas abertas • ${progress.completed ? "capítulo concluído" : progressSaved ? "progresso salvo localmente" : "progresso em memória: salvamento indisponível"}</p></div>`;
+    const target = q("#chapterPageText");
+    renderHighlightedText(target, text, progress.highlights[page]);
+    comments.forEach((comment, index) => {
+      const card = document.createElement("article"); card.className = "local-comment";
+      const author = document.createElement("strong"); author.textContent = typeof comment.author === "string" ? comment.author : "Jogador";
+      const content = document.createElement("p"); content.textContent = String(comment.text || "");
+      const remove = document.createElement("button"); remove.type = "button"; remove.className = "btn alt"; remove.textContent = "Excluir";
+      remove.onclick = () => { comments.splice(index, 1); progress.comments[page] = comments; persist(); renderReader(); };
+      card.append(author, content, remove); q("#pageComments").append(card);
+    });
+    q("#upgradeFont").oninput = (event) => { readerSize = Number(event.target.value); save("readerSize", readerSize); target.style.fontSize = readerSize + "px"; };
+    const highlightButton = q("#highlightSelection");
+    highlightButton.addEventListener("pointerdown", (event) => event.preventDefault());
+    highlightButton.onclick = () => {
+      const selected = selectedOffsets(target);
+      if (!selected) { toast("Selecione um trecho dentro do texto da página."); return; }
+      progress.highlights[page] = normalizeHighlights([...(progress.highlights[page] || []), selected], text);
+      const saved = persist(); renderHighlightedText(target, text, progress.highlights[page]); window.getSelection()?.removeAllRanges();
+      toast(saved ? "Trecho marcado e salvo neste aparelho." : "Trecho marcado em memória; não foi possível salvar.");
+    };
+    q("#clearHighlights").onclick = () => { delete progress.highlights[page]; persist(); renderHighlightedText(target, text, []); toast("Marcas removidas desta página."); };
+    q("#commentForm").onsubmit = (event) => {
+      event.preventDefault(); const content = q("#commentText").value.trim();
+      if (!content) return;
+      if (comments.length >= 50) { toast("Limite de 50 comentários por página. Exclua um para adicionar outro."); return; }
+      progress.comments[page] = [...comments, { author: state.name, text: content.slice(0, 1000), createdAt: new Date().toISOString() }];
+      const saved = persist(); renderReader(); toast(saved ? "Comentário salvo offline." : "Comentário em memória; não foi possível salvar.");
+    };
+    q("#uPrev").onclick = () => { progress.page = Math.max(0, page - 1); renderReader(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    q("#uVoice").onclick = () => speak(text, q("#uVoice"));
+    q("#uNext").onclick = () => {
+      if (page < chapter.pages.length - 1) { progress.page++; renderReader(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+      if (completeChapter(reading, chapter.number, chapter.pages.length)) {
+        state.unlocked = [...new Set([...state.unlocked, ...chars.filter((character) => character.unlock <= chapter.number).map((character) => character.id)])];
+        // Ledger and XP share one state JSON write, even if the separate annotations storage is full.
+        if (claimChapterReward(state, chapter.number)) reward(50, `Capítulo ${chapter.number} concluído`);
+        else { persist(); toast("Capítulo concluído. A recompensa já foi registrada."); }
+        renderCodex();
+      } else if (!progress.completed) { toast("Abra todas as páginas antes de concluir este capítulo."); return; }
+      renderStoryLibrary(); navigate("story");
+    };
+  }
+  const originalVoiceHandler = window.onAndroidVoiceState;
+  window.onAndroidVoiceState = (status) => {
+    if (!speech) { if (typeof originalVoiceHandler === "function") originalVoiceHandler(status); return; }
+    if (status === "done" || status === "error") { stopSpeech(); if (status === "error") toast("Narração indisponível neste aparelho."); }
+  };
+  function stopSpeech() {
+    if (!speech) return;
+    const active = speech; speech = null;
+    if (active.native && window.AndroidVoice?.stop) window.AndroidVoice.stop();
+    else if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (speechButton?.isConnected) { speechButton.dataset.reading = "false"; speechButton.textContent = "🔊 Voz"; }
+    speechButton = null;
+  }
+  function speak(text, button) {
+    if (speech && speechButton === button) { stopSpeech(); return; }
+    stopSpeech();
+    speechButton = button;
+    if (window.AndroidVoice?.speak) { speech = { native: true }; window.AndroidVoice.speak(text); }
+    else if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
+      const utterance = new SpeechSynthesisUtterance(text); speech = utterance;
+      utterance.lang = "pt-BR"; utterance.rate = 0.92;
+      utterance.onend = () => { if (speech === utterance) stopSpeech(); };
+      utterance.onerror = () => { if (speech === utterance) { stopSpeech(); toast("Narração indisponível."); } };
+      window.speechSynthesis.speak(utterance);
+    } else { speechButton = null; toast("Voz indisponível neste aparelho."); return; }
+    q("#soundtrack")?.pause();
+    button.dataset.reading = "true"; button.textContent = "■ Parar";
+  }
+  function isUnlocked(character) { return state.unlocked.includes(character.id) || state.chapter >= character.unlock; }
   function renderCodex() {
-    q("#characters").innerHTML =
-      `<header class="screen-head"><div class="eyebrow">Conheça o universo</div><h1>Personagens • ${state.unlocked.length}/22</h1><p class="lead">Leia capítulos e jogue para liberar arquivos.</p></header><div class="codex-grid">${chars
-        .map((c) => {
-          const open =
-            state.unlocked.includes(c.id) || state.chapter >= c.unlock;
-          return `<button class="codex-card ${open ? "" : "locked"}" data-char="${c.id}" ${open ? "" : "disabled"}><img src="${c.img}" alt="${open ? "Retrato de " + c.name : "Personagem bloqueado"}"><div class="info"><h3>${open ? c.name : "Arquivo bloqueado"}</h3><small>${open ? c.role : "Disponível no nível " + c.unlock}</small></div></button>`;
-        })
-        .join("")}</div>`;
+    const openCount = chars.filter(isUnlocked).length;
+    q("#characters").innerHTML = `<header class="screen-head"><div class="eyebrow">Conheça o universo</div><h1>Personagens • ${openCount}/${chars.length}</h1><p class="lead">Os 22 personagens e retratos recuperados foram preservados.</p></header><div class="codex-tools"><label class="field" for="codexSearch">Buscar personagem ou poder<input id="codexSearch" type="search" maxlength="80" placeholder="Caleb, tempestade…" value="${escapeHTML(codexQuery)}"></label><label class="field" for="codexFilter">Mostrar<select id="codexFilter"><option value="all">Todos</option><option value="open">Desbloqueados</option><option value="locked">Bloqueados</option></select></label></div><p id="codexCount" class="small" role="status"></p><div id="codexResults" class="codex-grid"></div>`;
+    q("#codexFilter").value = codexFilter;
+    const update = () => {
+      const query = codexQuery.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      const matches = chars.filter((character) => {
+        const open = isUnlocked(character), text = `${character.name} ${character.role} ${character.power}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        return text.includes(query) && (codexFilter === "all" || codexFilter === "open" && open || codexFilter === "locked" && !open);
+      });
+      q("#codexCount").textContent = `${matches.length} personagens encontrados`;
+      q("#codexResults").innerHTML = matches.map((character) => {
+        const open = isUnlocked(character);
+        return `<button class="codex-card ${open ? "" : "locked"}" data-char="${character.id}" ${open ? "" : "disabled"}><img src="${character.img}" alt="${open ? "Retrato de " + character.name : "Personagem bloqueado"}" loading="lazy"><div class="info"><h3>${open ? character.name : "Arquivo bloqueado"}</h3><small>${open ? character.role : "Disponível no nível " + character.unlock}</small></div></button>`;
+      }).join("");
+    };
+    q("#codexSearch").oninput = (event) => { codexQuery = event.target.value; update(); };
+    q("#codexFilter").onchange = (event) => { codexFilter = event.target.value; update(); };
+    update();
   }
   function showChar(id) {
-    const c = chars.find((x) => x.id === id);
-    if (!c) return;
-    q("#characterDetail").innerHTML =
-      `<button class="back" data-go="characters">← Voltar ao códice</button><img class="detail-hero" src="${c.img}" alt="Retrato de ${c.name}"><header class="screen-head"><div class="eyebrow">${c.role}</div><h1>${c.name}</h1><div class="detail-data"><span>${c.age}</span><span>${c.power}</span></div></header><article class="card lore"><h2>Arquivo</h2><p>${c.bio}</p><h2>Curiosidade desbloqueada</h2><p>${c.fact}</p></article>`;
-    const t = document.createElement("button");
-    t.dataset.go = "characterDetail";
-    document.body.append(t);
-    t.click();
-    t.remove();
+    const character = chars.find((item) => item.id === id);
+    if (!character || !isUnlocked(character)) return;
+    q("#characterDetail").innerHTML = `<button class="back" data-go="characters">← Voltar ao códice</button><img class="detail-hero" src="${character.img}" alt="Retrato de ${character.name}"><header class="screen-head"><div class="eyebrow">${character.role}</div><h1>${character.name}</h1><div class="detail-data"><span>${character.age}</span><span>${character.power}</span></div></header><article class="card lore"><h2>Arquivo</h2><p>${character.bio}</p><h2>Curiosidade desbloqueada</h2><p>${character.fact}</p></article>`;
+    navigate("characterDetail");
   }
-  q("#profile").innerHTML =
-    `<header class="screen-head"><div class="eyebrow">Identidade do jogador</div><h1>Login e perfil</h1></header><div class="profile-card"><div class="player-chip"><div class="avatar">C</div><div><strong id="profileName"></strong><small id="profileStats"></small></div></div><label class="field">Nome do jogador<input id="nameInput" maxlength="20" autocomplete="nickname"></label><button class="btn primary" id="saveProfile">Salvar perfil</button><p class="small">O perfil funciona offline e fica salvo somente neste aparelho.</p></div><div class="section-title"><h2>Conquistas</h2><small>arquivo pessoal</small></div><div><div class="achievement"><i>ϟ</i><div><b>Primeiro impacto</b><small> Abra o modo história</small></div></div><div class="achievement ${state.puzzle ? "" : "locked"}"><i>◈</i><div><b>Mente sincronizada</b><small> Complete o quebra-cabeça</small></div></div><div class="achievement ${state.bestRace >= 15 ? "" : "locked"}"><i>🏎</i><div><b>Fuga perfeita</b><small> Marque 15 pontos na corrida</small></div></div></div>`;
+  q("#profile").innerHTML = `<header class="screen-head"><div class="eyebrow">Identidade do jogador</div><h1>Perfil offline</h1></header><div class="profile-card"><div class="player-chip"><div class="avatar">C</div><div><strong id="profileName"></strong><small id="profileStats"></small></div></div><label class="field" for="nameInput">Nome do jogador<input id="nameInput" maxlength="20" autocomplete="nickname"></label><button class="btn primary" id="saveProfile">Salvar perfil neste aparelho</button><p class="small">Perfil, leitura e comentários são locais. Conta online e sincronização ainda indisponíveis.</p></div><div class="section-title"><h2>Conquistas</h2><small>arquivo pessoal</small></div><div id="achievements"></div>`;
   function profilePaint() {
     q("#profileName").textContent = state.name;
-    q("#profileStats").textContent =
-      `Nível ${state.chapter} • ${state.points} pontos`;
+    q("#profileStats").textContent = `Nível ${state.chapter} • ${state.points} pontos`;
     q("#nameInput").value = state.name;
+    q("#achievements").innerHTML = `<div class="achievement"><i>ϟ</i><div><b>Primeiro impacto</b><small> Abra a história</small></div></div><div class="achievement ${state.puzzle ? "" : "locked"}"><i>◈</i><div><b>Mente sincronizada</b><small> Complete Sinapses</small></div></div><div class="achievement ${state.bestRace >= 15 ? "" : "locked"}"><i>🏎</i><div><b>Fuga perfeita</b><small> Supere 15 destroços</small></div></div><div class="achievement ${state.quiz ? "" : "locked"}"><i>✦</i><div><b>Memória da tempestade</b><small> Acerte ao menos quatro perguntas</small></div></div>`;
   }
-  q("#saveProfile").addEventListener("click", () => {
-    const v = q("#nameInput").value.trim();
-    if (v) state.name = v;
-    persist();
-    profilePaint();
-    refreshHome();
-    toast("Perfil salvo");
-  });
-  function navigate(id) {
-    const button = document.createElement("button");
-    button.dataset.go = id;
-    document.body.append(button);
-    button.click();
-    button.remove();
-  }
-  function openChapter(n) {
-    const chapter = importedChapters.find((c) => c.number === n);
-    const parts = chapter?.pages || excerpts[n];
-    if (!parts) {
-      toast("Capítulo indisponível");
-      return;
-    }
-    let i = Math.min(load(`chapter_${n}_page`, 0), parts.length - 1);
-    const title =
-      chapter?.title || ch.find((c) => c.n === n)?.title || `Capítulo ${n}`;
-    const render = () => {
-      const sceneImage =
-        n === 1 && i >= 9
-          ? "scenes/mercenarios-rua-anime.png"
-          : n === 1 && i >= 5
-            ? "scenes/home-caleb-kaelum.png"
-            : `scenes/chapters/chapter-${n}.webp`;
-      const sceneCaption =
-        n === 1 && i >= 9
-          ? "O cerco nas ruas de Nerakar"
-          : n === 1 && i >= 5
-            ? "A energia kriptante desperta"
-            : `Cena do capítulo ${n}`;
-      q("#chapterReader").innerHTML =
-        `<button class="back" data-go="story">← Capítulos</button><div class="reader-shell"><header class="screen-head"><div class="eyebrow">Capítulo ${n} • página ${i + 1}/${parts.length}</div><h1>${title}</h1></header><figure class="reader-scene"><img class="chapter-cover" src="${sceneImage}" alt="Cena do capítulo ${n}"><figcaption>${sceneCaption}</figcaption></figure><article class="card chapter" style="font-size:${readerSize}px;white-space:pre-line">${parts[i]}</article><div class="book-panel"><label>Tamanho da letra</label><input id="upgradeFont" type="range" min="16" max="28" value="${readerSize}"></div><div class="reader-actions"><button class="btn alt" id="uPrev">←</button><button class="btn alt" id="uVoice">🔊 Voz</button><button class="btn primary" id="uNext">${i === parts.length - 1 ? "Concluir" : "Próxima →"}</button></div></div>`;
-      q("#upgradeFont").oninput = (e) => {
-        readerSize = +e.target.value;
-        save("readerSize", readerSize);
-        q("#chapterReader .chapter").style.fontSize = readerSize + "px";
-      };
-      q("#uPrev").onclick = () => {
-        i = Math.max(0, i - 1);
-        save(`chapter_${n}_page`, i);
-        render();
-      };
-      q("#uVoice").onclick = () => speak(parts[i], q("#uVoice"));
-      q("#uNext").onclick = () => {
-        if (i < parts.length - 1) {
-          i++;
-          save(`chapter_${n}_page`, i);
-          render();
-        } else {
-          state.scenes = Math.max(state.scenes, n * 4);
-          const unlocks = chars.filter((c) => c.unlock <= n).map((c) => c.id);
-          state.unlocked = [...new Set([...state.unlocked, ...unlocks])];
-          persist();
-          reward(50, `Capítulo ${n} concluído`);
-          renderCodex();
-          renderStoryLibrary();
-          navigate("story");
-        }
-      };
-    };
-    navigate("chapterReader");
-    render();
-  }
-  let speech = null;
-  function speak(text, button) {
-    if (speech && button?.dataset.reading === "true") {
-      if (window.AndroidVoice) window.AndroidVoice.stop();
-      else speechSynthesis.cancel();
-      speech = null;
-      button.dataset.reading = "false";
-      button.textContent = "🔊 Voz";
-      return;
-    }
-    if (window.AndroidVoice) {
-      speech = { native: true };
-      window.AndroidVoice.speak(text);
-      button.dataset.reading = "true";
-      button.textContent = "■ Parar";
-      window.onAndroidVoiceState = (state) => {
-        if (state === "done" || state === "error") {
-          speech = null;
-          if (button) {
-            button.dataset.reading = "false";
-            button.textContent = state === "error" ? "🔊 Tentar" : "🔊 Voz";
-          }
-        }
-      };
-      toast("Narração iniciada");
-      return;
-    }
-    if (!("speechSynthesis" in window)) {
-      toast("Voz indisponível neste celular");
-      return;
-    }
-    speechSynthesis.cancel();
-    speech = new SpeechSynthesisUtterance(text);
-    speech.lang = "pt-BR";
-    speech.rate = 0.92;
-    speech.onend = () => {
-      if (button) {
-        button.dataset.reading = "false";
-        button.textContent = "🔊 Voz";
-      }
-    };
-    speechSynthesis.speak(speech);
-    if (button) {
-      button.dataset.reading = "true";
-      button.textContent = "■ Parar";
-    }
-    toast("Narração iniciada");
+  q("#saveProfile").onclick = () => {
+    const value = q("#nameInput").value.trim(); if (value) state.name = value;
+    const saved = persist(); profilePaint(); refreshHome(); toast(saved ? "Perfil salvo neste aparelho." : "Perfil em memória; não foi possível salvar.");
+  };
+  q("#continueStory").onclick = () => {
+    const number = Number(load("lastReading", 1));
+    if (chapters.some((chapter) => chapter.number === number)) openChapter(number); else navigate("story");
+  };
+  q("#arcade").innerHTML = `<header class="screen-head"><div class="eyebrow">Central de jogos</div><h1>Treine. Corra. Descubra.</h1><p class="lead">Desafios com progresso salvo. Jogos param ao sair da tela ou pausar o aplicativo.</p></header><div class="mode-list"><button class="game-mode" data-play="race"><span class="icon">🏎</span><span><h3>Fuga de Nerakar</h3><p>Controle por toque e setas. Supere seu recorde.</p></span><b>30s</b></button><button class="game-mode" data-play="puzzle"><span class="icon">◈</span><span><h3>Sinapses</h3><p>Memorize quatro pares em até 32 tentativas.</p></span><b>90s</b></button><button class="game-mode" data-go="quiz"><span class="icon">✦</span><span><h3>Quiz da tempestade</h3><p>Seis perguntas preservadas sobre o capítulo 1.</p></span><b>Quiz</b></button><button class="game-mode" data-go="game"><span class="icon">ϟ</span><span><h3>Escolhas sob a chuva</h3><p>Cena alternativa original preservada.</p></span><b>Jogar</b></button></div><div id="gameStage"></div>`;
+  function cleanupGame(interrupted = false) {
+    if (!gameCleanup) return;
+    const cleanup = gameCleanup; gameCleanup = null; cleanup();
+    if (interrupted && q("#gameStage")) q("#gameStage").innerHTML = '<p class="notice">Desafio pausado ao sair ou colocar o aplicativo em segundo plano. Toque no modo para iniciar novamente.</p>';
   }
   function race() {
-    q("#gameStage").innerHTML =
-      `<div class="section-title"><h2>Fuga de Nerakar</h2><small>toque nas setas</small></div><div class="race"><div class="race-hud"><span id="raceScore">0</span><span id="raceTime">30s</span></div><div class="road"></div><div class="car"></div></div><div class="race-controls"><button id="left">←</button><button id="right">→</button></div>`;
-    let lane = 1,
-      score = 0,
-      time = 30,
-      run = true;
-    const car = q(".car"),
-      area = q(".race");
-    const move = (d) => {
-      lane = Math.max(0, Math.min(2, lane + d));
-      car.style.left = `calc(${30 + lane * 20}% - 22px)`;
-    };
-    q("#left").onclick = () => move(-1);
-    q("#right").onclick = () => move(1);
-    const spawn = setInterval(() => {
-      if (!run) return;
-      const o = document.createElement("div");
-      o.className = "obstacle";
-      const ol = Math.floor(Math.random() * 3);
-      o.style.left = `calc(${30 + ol * 20}% - 21px)`;
-      area.append(o);
-      let y = -70;
-      const fall = setInterval(() => {
-        y += 8;
-        o.style.top = y + "px";
-        if (
-          y > area.clientHeight - 115 &&
-          y < area.clientHeight - 25 &&
-          ol === lane
-        ) {
-          run = false;
-          clearInterval(fall);
-          o.remove();
-          finish();
-        } else if (y > area.clientHeight) {
-          clearInterval(fall);
-          o.remove();
-          score++;
-          q("#raceScore").textContent = score;
-        }
-      }, 45);
-    }, 720);
-    const timer = setInterval(() => {
-      time--;
-      q("#raceTime").textContent = time + "s";
-      if (time <= 0) {
-        run = false;
-        finish();
-      }
-    }, 1000);
+    cleanupGame();
+    q("#gameStage").innerHTML = `<div class="section-title"><h2>Fuga de Nerakar</h2><small>toque nas setas</small></div><div class="race"><div class="race-hud"><span id="raceScore">0</span><span id="raceTime">30s</span></div><div class="road"></div><div class="car"></div></div><div class="race-controls"><button id="left" aria-label="Mover para esquerda">←</button><button id="right" aria-label="Mover para direita">→</button></div>`;
+    const area = q(".race"), car = q(".car"), scoreLabel = q("#raceScore"), timeLabel = q("#raceTime");
+    let lane = 1, score = 0, elapsed = 0, last = 0, spawnElapsed = 0, frame = 0, active = true;
+    const obstacles = [];
+    const move = (direction) => { if (!active) return; lane = Math.max(0, Math.min(2, lane + direction)); car.style.left = `calc(${30 + lane * 20}% - 22px)`; };
+    const key = (event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); move(event.key === "ArrowLeft" ? -1 : 1); } };
+    q("#left").onclick = () => move(-1); q("#right").onclick = () => move(1);
+    document.addEventListener("keydown", key);
+    gameCleanup = () => { active = false; cancelAnimationFrame(frame); document.removeEventListener("keydown", key); obstacles.forEach((obstacle) => obstacle.node.remove()); };
     function finish() {
-      if (!q(".race")) return;
-      clearInterval(spawn);
-      clearInterval(timer);
-      state.bestRace = Math.max(state.bestRace, score);
-      persist();
-      reward(Math.min(100, score * 5), "Corrida concluída");
-      q("#gameStage").insertAdjacentHTML(
-        "beforeend",
-        `<div class="card"><h2>Fim da corrida</h2><p>${score} destroços superados.</p><button class="btn primary" data-play="race">Jogar novamente</button></div>`,
-      );
+      if (!active) return;
+      const previous = state.bestRace; state.bestRace = Math.max(previous, score);
+      cleanupGame(); persist();
+      // Reward only improvements, avoiding duplicate rewards from the same record.
+      if (score > previous) reward(Math.min(100, (score - previous) * 5), "Novo recorde na fuga");
+      q("#gameStage").insertAdjacentHTML("beforeend", `<div class="card"><h2>Fim da corrida</h2><p>${score} destroços superados. Recorde: ${state.bestRace}.</p><button class="btn primary" data-play="race">Jogar novamente</button></div>`);
     }
+    function tick(now) {
+      if (!active || !area.isConnected) return;
+      const delta = last ? Math.min(64, now - last) : 0; last = now; elapsed += delta; spawnElapsed += delta;
+      timeLabel.textContent = Math.max(0, Math.ceil((30000 - elapsed) / 1000)) + "s";
+      if (elapsed >= 30000) { finish(); return; }
+      if (spawnElapsed >= 780) {
+        spawnElapsed -= 780;
+        const node = document.createElement("div"); node.className = "obstacle";
+        const obstacle = { node, lane: Math.floor(Math.random() * 3), y: -70 };
+        node.style.left = `calc(${30 + obstacle.lane * 20}% - 21px)`; area.append(node); obstacles.push(obstacle);
+      }
+      for (let index = obstacles.length - 1; index >= 0; index--) {
+        const obstacle = obstacles[index]; obstacle.y += delta * (0.145 + elapsed / 300000);
+        obstacle.node.style.top = obstacle.y + "px";
+        if (obstacle.y > area.clientHeight - 115 && obstacle.y < area.clientHeight - 25 && obstacle.lane === lane) { finish(); return; }
+        if (obstacle.y > area.clientHeight) { obstacle.node.remove(); obstacles.splice(index, 1); score++; scoreLabel.textContent = score; }
+      }
+      frame = requestAnimationFrame(tick);
+    }
+    frame = requestAnimationFrame(tick);
   }
   function puzzle() {
-    const icons = ["ϟ", "◈", "⚙", "☄", "ϟ", "◈", "⚙", "☄"].sort(
-      () => Math.random() - 0.5,
-    );
-    q("#gameStage").innerHTML =
-      `<div class="section-title"><h2>Sinapses</h2><small>encontre os pares</small></div><div class="puzzle-board">${icons.map((x, i) => `<button class="puzzle-card" data-i="${i}" data-v="${x}">${x}</button>`).join("")}</div><p class="small">Cada par restaura uma parte do arquivo de Nerakar.</p>`;
-    let open = [],
-      done = 0;
-    qa(".puzzle-card").forEach(
-      (c) =>
-        (c.onclick = () => {
-          if (c.classList.contains("open") || open.length === 2) return;
-          c.classList.add("open");
-          open.push(c);
-          if (open.length === 2)
-            setTimeout(() => {
-              if (open[0].dataset.v === open[1].dataset.v) {
-                open.forEach((x) => x.classList.add("done"));
-                done += 2;
-                if (done === 8) {
-                  state.puzzle = true;
-                  persist();
-                  reward(80, "Sinapses restauradas");
-                }
-              } else open.forEach((x) => x.classList.remove("open"));
-              open = [];
-            }, 500);
-        }),
-    );
+    cleanupGame();
+    const icons = ["ϟ", "◈", "⚙", "☄", "ϟ", "◈", "⚙", "☄"];
+    for (let index = icons.length - 1; index > 0; index--) { const other = Math.floor(Math.random() * (index + 1)); [icons[index], icons[other]] = [icons[other], icons[index]]; }
+    q("#gameStage").innerHTML = `<div class="section-title"><h2>Sinapses</h2><small id="puzzleStatus">0/32 tentativas • 90s</small></div><div class="puzzle-board">${icons.map((_, index) => `<button class="puzzle-card" data-i="${index}" aria-label="Carta ${index + 1}, fechada"></button>`).join("")}</div><p class="small">Abra duas cartas para encontrar um par. Cada primeira vitória concede 80 pontos.</p>`;
+    const cards = qa(".puzzle-card"), status = q("#puzzleStatus");
+    let active = true, opened = [], matched = 0, attempts = 0, seconds = 90, timeout = 0;
+    const timer = setInterval(() => { if (!active) return; seconds--; paint(); if (seconds <= 0) finish(false); }, 1000);
+    gameCleanup = () => { active = false; clearInterval(timer); clearTimeout(timeout); cards.forEach((card) => { card.onclick = null; }); };
+    function paint() { status.textContent = `${attempts}/32 tentativas • ${seconds}s`; }
+    function finish(won) {
+      if (!active) return;
+      cleanupGame();
+      cards.forEach((card) => { card.disabled = true; });
+      if (won && !state.puzzle) { state.puzzle = true; persist(); reward(80, "Sinapses restauradas"); }
+      q("#gameStage").insertAdjacentHTML("beforeend", `<div class="card"><h2>${won ? "Sinapses restauradas" : "Tempo ou tentativas esgotados"}</h2><p>${matched / 2}/4 pares encontrados em ${attempts} tentativas.</p><button class="btn primary" data-play="puzzle">Jogar novamente</button></div>`);
+    }
+    cards.forEach((card, index) => {
+      card.onclick = () => {
+        if (!active || opened.length === 2 || card.classList.contains("open") || card.classList.contains("done")) return;
+        card.textContent = icons[index]; card.classList.add("open"); card.setAttribute("aria-label", `Carta ${index + 1}: ${icons[index]}`); opened.push({ card, index });
+        if (opened.length !== 2) return;
+        attempts++; paint();
+        const pair = [...opened];
+        timeout = setTimeout(() => {
+          if (!active) return;
+          if (icons[pair[0].index] === icons[pair[1].index]) {
+            pair.forEach(({ card: matchedCard }) => { matchedCard.classList.remove("open"); matchedCard.classList.add("done"); matchedCard.disabled = true; }); matched += 2;
+          } else pair.forEach(({ card: hiddenCard, index: hiddenIndex }) => { hiddenCard.classList.remove("open"); hiddenCard.textContent = ""; hiddenCard.setAttribute("aria-label", `Carta ${hiddenIndex + 1}, fechada`); });
+          opened = [];
+          if (matched === icons.length) finish(true); else if (attempts >= 32) finish(false);
+        }, 650);
+      };
+    });
   }
-  document.addEventListener("click", (e) => {
-    const chapterButton = e.target.closest("[data-chapter]");
-    if (chapterButton) {
-      openChapter(+chapterButton.dataset.chapter);
-      return;
-    }
-    const c = e.target.closest("[data-char]");
-    if (c) {
-      showChar(c.dataset.char);
-      return;
-    }
-    const p = e.target.closest("[data-play]");
-    if (p) {
-      p.dataset.play === "race" ? race() : puzzle();
-      q("#gameStage").scrollIntoView({ behavior: "smooth" });
-    }
-    const s = e.target.closest("[data-scene]");
-    if (s) {
-      toast("Cena ampliada • legenda liberada");
-      s.classList.toggle("expanded");
+  function screenChanged(id) {
+    if (!id || id === currentScreen) return;
+    const previous = currentScreen; currentScreen = id;
+    if (previous === "arcade") cleanupGame(true);
+    if (previous === "chapterReader") { stopSpeech(); persist(); }
+    if (id === "characters") renderCodex();
+    if (id === "profile") profilePaint();
+    if (id === "story") renderStoryLibrary();
+  }
+  document.addEventListener("click", (event) => {
+    const chapter = event.target.closest("[data-chapter]"); if (chapter) { openChapter(Number(chapter.dataset.chapter)); return; }
+    const character = event.target.closest("[data-char]"); if (character) { showChar(character.dataset.char); return; }
+    const play = event.target.closest("[data-play]");
+    if (play) { if (currentScreen !== "arcade") navigate("arcade"); play.dataset.play === "race" ? race() : puzzle(); q("#gameStage").scrollIntoView({ behavior: "smooth", block: "start" }); }
+    if (event.target.closest("#quizNext")) {
+      const result = q("#quizQuestion")?.textContent.match(/Você acertou (\d+) de (\d+)/);
+      if (result && Number(result[1]) >= 4 && !state.quiz) { state.quiz = true; persist(); reward(60, "Memória da tempestade"); }
     }
   });
-  const observer = new MutationObserver(() => {
-    const visible = qa(".page:not(.hidden)")[0];
-    if (!visible) return;
-    if (visible.id === "characters") renderCodex();
-    if (visible.id === "profile") profilePaint();
-    if (visible.id === "story") {
-      state.scenes = Math.max(state.scenes, 1);
-      persist();
-    }
+  document.addEventListener("sinapse:navigate", (event) => screenChanged(event.detail?.id));
+  // Observe only page class changes. Internal animation classes cannot rebuild a screen.
+  const observer = new MutationObserver((changes) => {
+    if (changes.some((change) => change.target.classList.contains("page"))) screenChanged(q(".page:not(.hidden)")?.id);
   });
-  observer.observe(q("main"), {
-    subtree: true,
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-  renderCodex();
-  profilePaint();
-  refreshHome();
+  qa(".page").forEach((page) => observer.observe(page, { attributes: true, attributeFilter: ["class"] }));
+  function pause() { persist(); stopSpeech(); cleanupGame(true); }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) pause(); });
+  document.addEventListener("sinapse:pause", pause);
+  window.addEventListener("pagehide", pause);
+  window.SinapseApp = { toast, reward, navigate, getChapters: () => chapters.map((chapter) => ({ ...chapter, pages: [...chapter.pages], images: chapter.images.map((image) => ({ ...image })) })), characters: chars, state, save: persist, openChapter };
+  // NativeLifecycle is also called before the WebView enters the background.
+  const previousNativeSave = window.SinapseNativeLifecycle?.save;
+  window.SinapseNativeLifecycle = { ...(window.SinapseNativeLifecycle || {}), save() { pause(); if (typeof previousNativeSave === "function") previousNativeSave(); } };
+  renderStoryLibrary(); renderCodex(); profilePaint(); refreshHome();
+  document.dispatchEvent(new CustomEvent("sinapse:ready", { bubbles: true, detail: { app: window.SinapseApp } }));
+  loadBook();
 })();

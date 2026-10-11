@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Lebre da Campina</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#a89c60" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a89c60"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#a89c60" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#c6b78a" d="M71 83 63 36q0-16 10-17 12 1 14 18l7 46m5-1 14-47q7-14 15-9 10 5 5 21l-18 42"/>
+<path fill="#e8cda5" d="m73 30 10 45m40-40-14 41" stroke="#b27e82" stroke-width="6"/>
+<ellipse fill="#c5b78a" cx="88" cy="119" rx="43" ry="31"/>
+<ellipse fill="#e8dbb9" cx="119" cy="92" rx="31" ry="26"/>
+<path fill="#d9cba6" d="M130 101q21 1 22 12l-18 14-26-7-9-14Z"/>
+<ellipse fill="#e8dfc3" cx="53" cy="117" rx="14" ry="15"/>
+<path fill="#a99a73" d="m60 139 1-19q7-15 23-5l8 23-17 10-25-1Zm45-19 16 2 1 20 24 2-2 8h-36Z"/>
+<path fill="#f2e7ca" d="m65 148 27-8 6 8m15-4 28 1-1 7"/>
+<ellipse fill="#393b32" cx="126" cy="90" rx="5" ry="7"/>
+<circle fill="#fcf9de" stroke="none" cx="127" cy="88" r="2"/>
+<path fill="#b17b7f" d="m146 107 7 6-7 5-6-6Z"/>
+<path fill="none" stroke="#756c55" stroke-width="2" d="m134 115-22 0m22 6-20 6"/>
+<path fill="#8dac66" d="m38 152 4-10 5 9m103-6 6-16 5 17"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#a89c60" stroke-width="2" opacity=".7"/>
+</svg>

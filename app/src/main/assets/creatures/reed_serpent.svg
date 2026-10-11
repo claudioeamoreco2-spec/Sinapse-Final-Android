@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Serpente dos Juncos</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#538967" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#538967"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#538967" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#54825f" d="M144 147q-13 11-64 8-45-3-40-27 3-17 35-21l35-4q20-2 21-20l-3-21 20-9 12 28q8 35-40 45l-37 6q-13 3-3 7l48 1Z"/>
+<path fill="#97b273" d="M142 139q-39 10-76-4-9-5 8-12l38-9q23-9 24-27l8-12q20 37-32 47l-27 9Z"/>
+<path fill="#649d75" d="m123 62-4-18 14-16 25 8 12 21-9 15-24-3Z"/>
+<path fill="#d3cd8a" d="m150 53 21 5-9 15-18-4-10-9Z"/>
+<path fill="#326846" d="m132 30-7-17 15 9 7-10 7 23m-21 32-14 7 4-17"/>
+<path fill="#ebca58" d="m142 42 14 0-4 8-8-1Z"/>
+<path fill="#233e35" d="m149 43 2 5"/>
+<path fill="none" stroke="#ca7466" stroke-width="2" d="m164 66 15 8m-5-3 7-3m-7 3 6 7"/>
+<path fill="none" stroke="#2f6243" stroke-width="3" d="m73 114 7 10m15-14 7 10m15-16 7 9m7-19 12 3m-5-18 11-2m-90 51 5 11m16-8 2 12m19-11-1 12"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#538967" stroke-width="2" opacity=".7"/>
+</svg>

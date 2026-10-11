@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Espectro de Cinzas</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#867879" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#867879"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#867879" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#44404e" d="M51 138 69 112 63 79l12-20 5-29 19-12 22 15 8 30-2 24 11 29 15 26-19-5-4 21-20-14-15 16-13-18-25 12 5-22Z"/>
+<path fill="#696272" d="m76 78 7-38 16-13 16 12 9 43-11 24-32-5Z"/>
+<path fill="#a5a0a1" d="m85 51 15-9 15 11-7 30-19 0Z"/>
+<path fill="#3a3543" d="m87 57 11 4-6 10-5-2Zm17 4 12-5-4 14-7 1Z"/>
+<path fill="#d4b777" d="m89 61 5 2-3 4m16-4 6-3-3 7" stroke="#d4b777" stroke-width="2"/>
+<path fill="#49404f" d="m97 70 4 10-7 0Z"/>
+<path fill="none" stroke="#3e3545" stroke-width="2" d="m91 83 16 0m-12-2v7m6-7v7"/>
+<path fill="#756775" d="m72 86-18 6-18 25 12 4 20-17m54-18 18 6 19 24-13 4-20-16"/>
+<path fill="#bab1b2" d="m38 113-13 3-5 14 12-5 5 9 7-14m112-7 15 6 3 14-12-9-6 9-5-14"/>
+<path fill="#998990" d="m86 110 14 17-10 19-13-13Zm23-2 10 14-5 18-13-12Z"/>
+<circle fill="#a49793" stroke="none" cx="45" cy="66" r="3"/><circle fill="#b8aaa0" stroke="none" cx="145" cy="53" r="4"/><circle fill="#a0908d" stroke="none" cx="158" cy="143" r="2"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#867879" stroke-width="2" opacity=".7"/>
+</svg>

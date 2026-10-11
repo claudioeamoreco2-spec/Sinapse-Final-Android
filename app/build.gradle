@@ -6,11 +6,24 @@ android {
         applicationId 'com.sinapsefinal.leitor'
         minSdk 23
         targetSdk 35
-        versionCode 8
-        versionName '3.3'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        versionCode 9
+        versionName '3.4.0'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+        htmlReport true
+        xmlReport true
+    }
+}
+
+dependencies {
+    androidTestImplementation 'androidx.test:core:1.6.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
 }

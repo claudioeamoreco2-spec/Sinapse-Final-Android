@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Aranha de Cristal</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#8365a6" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8365a6"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#8365a6" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="none" stroke="#9b7bba" stroke-width="7" d="m72 83-24-19-20 16 2 27m44-10-31-5-20 19 3 18m48-9-24 8-9 27m89-72 25-20 20 17-2 26m-44-10 29-4 21 20-3 19m-48-10 24 8 9 27"/>
+<path fill="none" stroke="#cdb5e8" stroke-width="3" d="m71 82-24-18-19 16m101 2 24-19 19 16"/>
+<path fill="#7955a0" d="m96 42 28 20 12 34-18 30-45-1-18-30 16-33Z"/>
+<path fill="#b89adb" d="m96 42-6 43-19-23Zm0 0 28 20-16 23Z"/>
+<path fill="#7d6fb3" d="m71 62 19 23-35 10Zm53 0 12 34-28-11Z"/>
+<path fill="#dbc2ef" d="m90 85 18 0 10 41-45-1Z"/>
+<path fill="#66518f" d="m55 95 35-10-17 40Zm53-10 28 11-18 30Z"/>
+<ellipse fill="#57476f" cx="97" cy="124" rx="25" ry="20"/>
+<path fill="#ae8fca" d="m79 138-4 12 12-4m28-8 4 12-11-4"/>
+<circle fill="#9af0e2" cx="86" cy="120" r="4"/><circle fill="#9af0e2" cx="107" cy="120" r="4"/>
+<circle fill="#d9b7ef" cx="97" cy="114" r="3"/>
+<path fill="none" stroke="#ead5f8" stroke-width="2" d="m100 55 6 15m-35 23 11-3"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#8365a6" stroke-width="2" opacity=".7"/>
+</svg>

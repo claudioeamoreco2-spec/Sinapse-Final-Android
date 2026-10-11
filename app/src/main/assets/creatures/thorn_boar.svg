@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Javali de Espinhos</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#62516f" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#62516f"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#62516f" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#583f58" d="M37 128 32 99Q34 72 69 72h37q24 0 32 22l23 7 10 22-14 10-30-3-13 17h-14l-3-16H72l-10 16H47l2-18Z"/>
+<path fill="#8c5c74" d="M35 100q15-27 48-20l35 9 15 29-32 13H50Z"/>
+<path fill="#343143" d="m47 79-2-25 19 16 5-30 14 28 15-27 5 30 19-17-1 25Z"/>
+<path fill="#bb9da1" d="m46 58 11 17m14-29 8 22m17-21 2 22"/>
+<path fill="#a47182" d="m134 95-12-20 18 8 8 18 18 7 3 15-29 4-19-16Z"/>
+<ellipse fill="#483342" cx="160" cy="116" rx="15" ry="13"/>
+<ellipse fill="#b8959e" cx="165" cy="115" rx="11" ry="9"/>
+<circle fill="#302938" cx="161" cy="114" r="2"/><circle fill="#302938" cx="169" cy="114" r="2"/>
+<path fill="#ffcc6a" d="m135 97 9 1-3 5-6-2Z"/>
+<path fill="#f4d9b5" d="M145 124q-10-2-11-16-11 16 2 24Zm11 6q13-1 18-14 1 18-13 22Z"/>
+<path fill="none" stroke="#bd8b91" stroke-width="3" d="m43 105 15-10m4 19 14-13m13 15 14-14"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#62516f" stroke-width="2" opacity=".7"/>
+</svg>

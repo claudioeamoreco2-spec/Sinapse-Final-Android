@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Coruja do Crepúsculo</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#64568f" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#64568f"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#64568f" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#413657" d="M89 68Q66 43 25 59l15 20-21 8 24 17-13 10 30 14 22-17m18-42q28-28 65-10l-14 22 21 7-23 17 12 11-29 13-21-18Z"/>
+<path fill="#776692" d="m38 64 41 20-23 20-20-15 11-5m107-18-36 18 20 22 24-15-12-7"/>
+<path fill="#5b4c7b" d="m68 65 1-25 22 15 11-4 22-12-3 27 8 43-18 35H83l-18-35Z"/>
+<path fill="#aea2b8" d="M72 73q15-17 27 4 12-23 25-7l-4 32-23 11-24-10Z"/>
+<ellipse fill="#493650" cx="83" cy="80" rx="11" ry="13"/><ellipse fill="#493650" cx="112" cy="80" rx="11" ry="13"/>
+<circle fill="#f7c661" cx="84" cy="81" r="7"/><circle fill="#f7c661" cx="111" cy="81" r="7"/>
+<ellipse fill="#292637" cx="85" cy="81" rx="2.5" ry="6"/><ellipse fill="#292637" cx="110" cy="81" rx="2.5" ry="6"/>
+<path fill="#d69b61" d="m91 94 13-1-7 15Z"/>
+<path fill="#8b7a9b" d="m80 116 17 12 20-15-8 25H88Z"/>
+<path fill="none" stroke="#cebb93" stroke-width="4" d="m80 146 8-5 7 7m8-1 7-6 8 4"/>
+<path fill="none" stroke="#9382a9" stroke-width="3" d="m47 70 24 12m-21 17 18 9m75-38-24 13m22 17-15 8"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#64568f" stroke-width="2" opacity=".7"/>
+</svg>

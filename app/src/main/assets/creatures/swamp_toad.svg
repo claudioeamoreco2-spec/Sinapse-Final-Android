@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+<title id="title">Sapo do Pântano</title>
+<defs>
+<radialGradient id="backdrop" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="#748b43" stop-opacity=".38"/><stop offset="1" stop-color="#111923"/></radialGradient>
+<linearGradient id="frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#748b43"/><stop offset="1" stop-color="#243541"/></linearGradient>
+</defs>
+<rect x="5" y="5" width="182" height="182" rx="30" fill="url(#backdrop)" stroke="url(#frame)" stroke-width="2"/>
+<circle cx="96" cy="96" r="71" fill="none" stroke="#748b43" stroke-width="1" opacity=".25"/>
+<ellipse cx="96" cy="155" rx="64" ry="10" fill="#0a1016" opacity=".72"/>
+<g stroke="#202832" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<path fill="#697b40" d="M44 99Q28 72 49 64l17 12 46-2 21-16q22 0 17 31l-10 21 20 24-22 16-40-7-49 7-25-19Z"/>
+<path fill="#8ea14b" d="M45 94q4-27 24-20 27-15 51 0 29-10 29 20l-18 27-33 13-42-14Z"/>
+<path fill="#aabc69" d="M55 105q41 12 80-4l-6 26-36 14-36-13Z"/>
+<ellipse fill="#7b9544" cx="64" cy="74" rx="19" ry="20"/><ellipse fill="#7b9544" cx="126" cy="73" rx="19" ry="20"/>
+<ellipse fill="#e9bf53" cx="64" cy="75" rx="12" ry="13"/><ellipse fill="#e9bf53" cx="126" cy="74" rx="12" ry="13"/>
+<ellipse fill="#30392a" cx="65" cy="75" rx="4" ry="10"/><ellipse fill="#30392a" cx="125" cy="74" rx="4" ry="10"/>
+<path fill="none" stroke="#394b30" stroke-width="4" d="M53 103q40 19 82-2"/>
+<path fill="#8c9e50" d="m45 114-22 22 19 10 20-15m73-15 24 21-16 13-26-19"/>
+<path fill="#a6b564" d="m56 127-8 19-18 7 2 7 26-3 12-26m49-3 10 21 18 6-2 7-27-5-12-24"/>
+<circle fill="#a8bb67" cx="85" cy="84" r="4"/><circle fill="#a8bb67" cx="102" cy="91" r="3"/><circle fill="#a8bb67" cx="89" cy="96" r="3"/>
+</g>
+<path d="M29 169h16m102 0h16" fill="none" stroke="#748b43" stroke-width="2" opacity=".7"/>
+</svg>
