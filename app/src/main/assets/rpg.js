@@ -324,7 +324,19 @@
     });
     q('#rpg-collect').addEventListener('click',collect);q('#rpg-water').addEventListener('click',()=>water());q('#rpg-rest').addEventListener('click',()=>{if(game.rest)action(()=>game.rest());});q('#rpg-talk').addEventListener('click',()=>talk());q('#rpg-quick-heal').addEventListener('click',()=>action(()=>game.useItem('food')));
     q('#rpg-save-now').addEventListener('click',persist);q('#rpg-export').addEventListener('click',exportProgress);
-    q('#rpg-import').addEventListener('change',async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;if(file.size>2000000)return tell('Arquivo de progresso grande demais.');try{const next=Engine.importSave(await file.text());const backup=game.save(storage);if(!backup.ok)return tell('Não foi possível guardar o progresso atual. Importação cancelada.');game=next;persist();render();renderBestiary();tell('Progresso importado; o anterior está na cópia de segurança.');}catch(_){tell('Arquivo de progresso inválido. Seu progresso atual foi preservado.');}});
+    q('#rpg-import').addEventListener('change',async e=>{
+      const file=e.target.files[0];e.target.value='';if(!file)return;
+      if(file.size>2000000)return tell('Arquivo de progresso grande demais.');
+      try{
+        const next=Engine.importSave(await file.text()), backup=game.save(storage);
+        if(!backup.ok)return tell('Não foi possível guardar o progresso atual. Importação cancelada.');
+        const saved=next.save(storage);
+        if(!saved.ok){q('#rpg-save-status').textContent=saved.message;return tell('Não foi possível salvar o progresso importado. Importação cancelada; seu progresso atual foi preservado.');}
+        clearTimeout(pendingSave);game=next;selectedNpc=null;atlasSignature=null;lastSave=Date.now();storageWarning=false;
+        q('#rpg-save-status').textContent='Salvo às '+new Date(lastSave).toLocaleTimeString('pt-BR');
+        render();renderBestiary();tell('Progresso importado; o anterior está na cópia de segurança.');
+      }catch(_){tell('Arquivo de progresso inválido. Seu progresso atual foi preservado.');}
+    });
     canvas.addEventListener('click',e=>{if(!active)return;const rect=canvas.getBoundingClientRect(),col=Math.floor((e.clientX-rect.left)/rect.width*13)-6,row=Math.floor((e.clientY-rect.top)/rect.height*11)-5;if(Math.abs(col)+Math.abs(row)!==1)return;const p=game.state.player,node=game.resourceAt(p.x+col,p.y+row);if(node&&node.remaining)action(()=>game.gather(p.x+col,p.y+row));else action(()=>game.move(col,row));});
     document.addEventListener('keydown',e=>{if(!active||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.ctrlKey||e.metaKey||e.altKey)return;const map={ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down',ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right'};if(map[e.key]){e.preventDefault();control(map[e.key]);}else if(e.key.toLowerCase()==='e'){e.preventDefault();collect();}else if(e.key.toLowerCase()==='r'){e.preventDefault();water();}else if(e.key.toLowerCase()==='f'){e.preventDefault();talk();}else if(e.key===' '&&game.state.combat){e.preventDefault();action(()=>game.battle('attack'),'rpg-hit');}else if(e.key.toLowerCase()==='q'&&game.state.combat){e.preventDefault();action(()=>game.battle('dodge'),'rpg-dodge');}});
     bestiary.querySelector('#rpg-beast-search').addEventListener('input',renderBestiary);bestiary.querySelector('#rpg-beast-filter').addEventListener('change',renderBestiary);

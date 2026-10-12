@@ -56,7 +56,8 @@ def run(browser_path):
             page.reload()
             page.wait_for_function('window.SinapseApp && window.SinapseApp.getChapters().length === 12')
             page.evaluate('SinapseApp.openChapter(1)')
-            assert 'página 2/6' in page.locator('#chapterReader').inner_text()
+            assert page.evaluate('JSON.parse(localStorage.getItem("sf2_reading"))["1"].page') == 1
+            assert 'página 2/6' in page.locator('#chapterReader').inner_text().lower()
             page.locator('#uPrev').click()
             assert page.locator('#chapterPageText mark').count() == 1
             assert xss in page.locator('#pageComments').inner_text()
@@ -193,7 +194,8 @@ def run(browser_path):
             assert page.evaluate('NerakarRPG.getGame().state.player.x') == 26
             assert page.evaluate('NerakarRPG.getGame().state.player.y') == 20
             page.evaluate('SinapseApp.openChapter(1)')
-            assert 'página 3/6' in page.locator('#chapterReader').inner_text()
+            assert page.evaluate('JSON.parse(localStorage.getItem("sf2_reading"))["1"].page') == 2
+            assert 'página 3/6' in page.locator('#chapterReader').inner_text().lower()
             results.append('Backup completo exporta/restaura leitor e RPG sem ser sobrescrito por pagehide')
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth + 2'), 'Overflow horizontal mobile'
             assert not missing, missing

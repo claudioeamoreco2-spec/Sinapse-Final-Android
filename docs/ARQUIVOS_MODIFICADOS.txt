@@ -91,6 +91,7 @@ scripts/test_browser.py
 scripts/tests/AndroidCoreTest.java
 scripts/verify_project.py
 tests/reader.cjs
+tests/rpg-import.test.cjs
 tests/rpg.test.cjs
 tests/shell.test.cjs
 tests/test_chapter_import.py
