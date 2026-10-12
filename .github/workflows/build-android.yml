@@ -31,6 +31,9 @@ jobs:
         with:
           gradle-version: '8.9'
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Instalar SDK Android 35
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Validar importação e módulos offline
@@ -90,6 +93,9 @@ jobs:
         with:
           gradle-version: '8.9'
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Preparar áudio e SDK
         run: |
           python3 scripts/generate_soundtrack.py
