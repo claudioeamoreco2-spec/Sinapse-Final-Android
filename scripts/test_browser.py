@@ -103,9 +103,11 @@ def run(browser_path):
             results.append('Corrida/memória e troca de telas sem callbacks obsoletos')
             page.locator('nav [data-go="characters"]').click()
             page.locator('#codexSearch').fill('Caleb')
-            assert page.locator('#codexResults [data-char]').count() == 1
+            # Search also includes roles: Sael is identified as Caleb's father.
+            expect(page.locator('#codexResults [data-char]')).to_have_count(2)
+            assert sorted(page.locator('#codexResults [data-char]').evaluate_all('(cards) => cards.map(card => card.dataset.char)')) == ['caleb', 'sael']
             page.locator('#codexSearch').fill('')
-            assert page.locator('#codexResults [data-char]').count() == 22
+            expect(page.locator('#codexResults [data-char]')).to_have_count(22)
             results.append('Códice: 22 retratos preservados e busca funcional')
 
             page.locator('nav [data-go="rpg"]').click()
