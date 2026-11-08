@@ -481,8 +481,10 @@
   let speech = null;
   function speak(text, button) {
     if (speech && button?.dataset.reading === "true") {
-      if (window.AndroidVoice) window.AndroidVoice.stop();
-      else speechSynthesis.cancel();
+      if (window.AndroidVoice) {
+        window.__activeVoiceOwner = null;
+        window.AndroidVoice.stop();
+      } else speechSynthesis.cancel();
       speech = null;
       button.dataset.reading = "false";
       button.textContent = "🔊 Voz";
@@ -490,16 +492,19 @@
     }
     if (window.AndroidVoice) {
       speech = { native: true };
+      window.__activeVoiceOwner = "chapter";
       window.AndroidVoice.speak(text);
       button.dataset.reading = "true";
       button.textContent = "■ Parar";
-      window.onAndroidVoiceState = (state) => {
-        if (state === "done" || state === "error") {
+      window.__activeVoiceOwner = "chapter";
+      window.__chapterVoiceState = (state) => {
+        if (state === "done" || state === "stopped" || state === "error") {
           speech = null;
           if (button) {
             button.dataset.reading = "false";
             button.textContent = state === "error" ? "🔊 Tentar" : "🔊 Voz";
           }
+          window.__activeVoiceOwner = null;
         }
       };
       toast("Narração iniciada");
