@@ -16,6 +16,8 @@ public class MainActivity extends Activity {
     private WebView webView;
     private TextToSpeech textToSpeech;
     private String pendingSpeech;
+    private String activeUtteranceId;
+    private int utteranceSequence = 0;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,12 +35,24 @@ public class MainActivity extends Activity {
                 textToSpeech.setLanguage(new Locale("pt", "BR"));
                 textToSpeech.setSpeechRate(0.92f);
                 textToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                    @Override public void onStart(String id) { voiceEvent("reading"); }
-                    @Override public void onDone(String id) { voiceEvent("done"); }
-                    @Override public void onError(String id) { voiceEvent("error"); }
+                    @Override public void onStart(String id) {
+                        if (id.equals(activeUtteranceId)) voiceEvent("reading");
+                    }
+                    @Override public void onDone(String id) {
+                        if (id.equals(activeUtteranceId)) {
+                            activeUtteranceId = null;
+                            voiceEvent("done");
+                        }
+                    }
+                    @Override public void onError(String id) {
+                        if (id.equals(activeUtteranceId)) {
+                            activeUtteranceId = null;
+                            voiceEvent("error");
+                        }
+                    }
                 });
                 if (pendingSpeech != null) {
-                    textToSpeech.speak(pendingSpeech, TextToSpeech.QUEUE_FLUSH, null, "sinapse");
+                    speakNow(pendingSpeech);
                     pendingSpeech = null;
                 }
             } else voiceEvent("error");
@@ -46,6 +60,11 @@ public class MainActivity extends Activity {
         webView.setBackgroundColor(Color.rgb(7, 6, 17));
         setContentView(webView);
         webView.loadUrl("file:///android_asset/index.html");
+    }
+    private void speakNow(String text) {
+        String id = "sinapse-" + (++utteranceSequence);
+        activeUtteranceId = id;
+        textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, id);
     }
     private void voiceEvent(String state) {
         runOnUiThread(() -> {
@@ -57,13 +76,14 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void speak(String text) {
             runOnUiThread(() -> {
                 if (textToSpeech == null) pendingSpeech = text;
-                else textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, "sinapse");
+                else speakNow(text);
             });
         }
         @JavascriptInterface public void stop() {
             runOnUiThread(() -> {
+                activeUtteranceId = null;
                 if (textToSpeech != null) textToSpeech.stop();
-                voiceEvent("done");
+                voiceEvent("stopped");
             });
         }
     }
